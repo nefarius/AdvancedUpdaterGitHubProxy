@@ -5,7 +5,6 @@ services:
     build: .
     container_name: aughp
     volumes:
-      - ./appsettings.json:/app/appsettings.json:ro
       - ./logs:/app/logs
     restart: unless-stopped
     networks:
