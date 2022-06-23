@@ -4,6 +4,7 @@ using AdvancedUpdaterGitHubProxy.Extensions;
 using FastEndpoints.Swagger;
 
 using Serilog;
+using Serilog.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +62,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDefaultExceptionHandler();
 }
+
+app.Use(async (ctx, next) => {
+    using (LogContext.PushProperty("IPAddress", ctx.Connection.RemoteIpAddress))
+    {
+        await next(ctx);
+    }
+});
 
 app.UseAuthentication();
 app.UseAuthorization();
