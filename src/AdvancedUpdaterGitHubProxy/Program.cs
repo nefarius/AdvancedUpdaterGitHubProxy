@@ -1,8 +1,10 @@
+using System.Net;
 using System.Text.Json;
 
 using AdvancedUpdaterGitHubProxy.Extensions;
 using FastEndpoints.Swagger;
 
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.FileProviders;
 
 using Serilog;
@@ -64,6 +66,14 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDefaultExceptionHandler();
 }
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.All,
+    RequireHeaderSymmetry = false,
+    ForwardLimit = null,
+    KnownProxies = { IPAddress.Parse("172.24.0.6") },
+});
 
 app.UseSerilogRequestLogging(
     options =>
