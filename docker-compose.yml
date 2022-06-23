@@ -1,0 +1,23 @@
+﻿version: "3"
+
+services:
+  aughp:
+    build: .
+    container_name: aughp
+    volumes:
+      - ./appsettings.json:/app/appsettings.json:ro
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - web
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.updates.rule=Host(`updates.vigem.org`)
+      - traefik.http.routers.updates.entrypoints=web-secure
+      - traefik.http.routers.updates.tls=true
+      - traefik.http.routers.updates.tls.certresolver=le
+      - traefik.http.services.updates.loadbalancer.server.port=80
+
+networks:
+  web:
+    external: true

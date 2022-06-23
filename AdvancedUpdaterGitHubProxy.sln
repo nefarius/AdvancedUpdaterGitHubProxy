@@ -1,23 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A7B1E56F-3513-47F6-AB8B-9C29660EA2A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvancedUpdaterGitHubProxy.E2E.Tests", "tests\AdvancedUpdaterGitHubProxy.E2E.Tests\AdvancedUpdaterGitHubProxy.E2E.Tests.csproj", "{6EB64484-67A2-4CD5-B0F2-3011404D6C4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedUpdaterGitHubProxy.E2E.Tests", "tests\AdvancedUpdaterGitHubProxy.E2E.Tests\AdvancedUpdaterGitHubProxy.E2E.Tests.csproj", "{6EB64484-67A2-4CD5-B0F2-3011404D6C4D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A9CED488-D3A4-4556-A93D-0511C8ABF1D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvancedUpdaterGitHubProxy", "src\AdvancedUpdaterGitHubProxy\AdvancedUpdaterGitHubProxy.csproj", "{8849DB04-EE08-4A25-A847-846E1A002413}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedUpdaterGitHubProxy", "src\AdvancedUpdaterGitHubProxy\AdvancedUpdaterGitHubProxy.csproj", "{8849DB04-EE08-4A25-A847-846E1A002413}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{64147DD2-B7F8-41AC-B4B8-DD3CF38FEE7F}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		Dockerfile = Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{6EB64484-67A2-4CD5-B0F2-3011404D6C4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -29,8 +32,14 @@ Global
 		{8849DB04-EE08-4A25-A847-846E1A002413}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8849DB04-EE08-4A25-A847-846E1A002413}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6EB64484-67A2-4CD5-B0F2-3011404D6C4D} = {A7B1E56F-3513-47F6-AB8B-9C29660EA2A4}
 		{8849DB04-EE08-4A25-A847-846E1A002413} = {A9CED488-D3A4-4556-A93D-0511C8ABF1D8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A8BECA71-6525-437A-99B0-F66351B924A3}
 	EndGlobalSection
 EndGlobal
