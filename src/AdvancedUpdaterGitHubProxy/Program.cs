@@ -72,7 +72,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.All,
     RequireHeaderSymmetry = false,
     ForwardLimit = null,
-    KnownNetworks = { new IPNetwork(IPAddress.Parse("172.24.0.0"), 32) }
+    KnownProxies = { IPAddress.Parse("172.24.0.6") },
 });
 
 app.UseSerilogRequestLogging(
