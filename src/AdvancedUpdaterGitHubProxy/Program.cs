@@ -3,6 +3,8 @@ using System.Text.Json;
 using AdvancedUpdaterGitHubProxy.Extensions;
 using FastEndpoints.Swagger;
 
+using Microsoft.Extensions.FileProviders;
+
 using Serilog;
 using Serilog.Context;
 
@@ -63,12 +65,20 @@ if (app.Environment.IsDevelopment())
     app.UseDefaultExceptionHandler();
 }
 
-app.Use(async (ctx, next) => {
-    using (LogContext.PushProperty("IPAddress", ctx.Connection.RemoteIpAddress))
+app.UseSerilogRequestLogging(
+    options =>
     {
-        await next(ctx);
-    }
-});
+        options.MessageTemplate =
+            "{RemoteIpAddress} {RequestScheme} {RequestHost} {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+        options.EnrichDiagnosticContext = (
+            diagnosticContext,
+            httpContext) =>
+        {
+            diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+            diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+            diagnosticContext.Set("RemoteIpAddress", httpContext.Connection.RemoteIpAddress);
+        };
+    });
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -81,6 +91,10 @@ app.UseFastEndpoints(options =>
 });
 
 app.UseDefaultFiles();
+
+app.UseStaticFiles(new StaticFileOptions() {
+    FileProvider =  new PhysicalFileProvider(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"wwwroot")),
+});
 
 if (app.Environment.IsDevelopment())
 {
