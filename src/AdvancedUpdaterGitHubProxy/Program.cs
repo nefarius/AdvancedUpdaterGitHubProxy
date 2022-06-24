@@ -76,7 +76,10 @@ ForwardedHeadersOptions headerOptions = new()
     ForwardedHeaders = ForwardedHeaders.All, RequireHeaderSymmetry = false, ForwardLimit = null
 };
 
-knownProxies.AddRange(knownProxies);
+foreach (var proxy in knownProxies)
+{
+    headerOptions.KnownProxies.Add(proxy);
+}
 
 app.UseForwardedHeaders(headerOptions);
 
