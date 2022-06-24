@@ -17,7 +17,7 @@ public class IndexEndpoint : EndpointWithoutRequest<IndexResponse>
     {
         await SendOkAsync(new IndexResponse
         {
-            Message = "Hello Fast Endpoints"
+            Message = "Server up and running"
         }, ct);
     }
 }
