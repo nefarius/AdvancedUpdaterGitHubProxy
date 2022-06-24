@@ -9,6 +9,8 @@ services:
     restart: unless-stopped
     networks:
       - web
+    environment:
+      - TZ=Europe/Vienna
     labels:
       - traefik.enable=true
       - traefik.http.routers.updates.rule=Host(`updates.vigem.org`)
