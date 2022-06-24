@@ -2,19 +2,20 @@ using System.Net;
 using System.Text.Json;
 
 using AdvancedUpdaterGitHubProxy.Extensions;
+
 using FastEndpoints.Swagger;
 
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.FileProviders;
 
 using Serilog;
-using Serilog.Context;
+using Serilog.Core;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 #region Configuration
 
-var configuration = new ConfigurationBuilder()
+IConfigurationRoot? configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false, true)
     .Build();
 
@@ -22,7 +23,7 @@ var configuration = new ConfigurationBuilder()
 
 #region Logging
 
-var logger = new LoggerConfiguration()
+Logger? logger = new LoggerConfiguration()
     .ReadFrom.Configuration(configuration)
     .Enrich.FromLogContext()
     .CreateLogger();
@@ -60,20 +61,24 @@ builder.Services.AddSwaggerDoc(addJWTBearerAuth: false);
 
 builder.Services.AddHttpClient();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDefaultExceptionHandler();
 }
 
-app.UseForwardedHeaders(new ForwardedHeadersOptions
+List<IPAddress> knownProxies =
+    ((List<string>)configuration.GetSection("KnownProxies")).Select(IPAddress.Parse).ToList();
+
+ForwardedHeadersOptions headerOptions = new ForwardedHeadersOptions
 {
-    ForwardedHeaders = ForwardedHeaders.All,
-    RequireHeaderSymmetry = false,
-    ForwardLimit = null,
-    KnownProxies = { IPAddress.Parse("172.24.0.6") },
-});
+    ForwardedHeaders = ForwardedHeaders.All, RequireHeaderSymmetry = false, ForwardLimit = null
+};
+
+knownProxies.AddRange(knownProxies);
+
+app.UseForwardedHeaders(headerOptions);
 
 app.UseSerilogRequestLogging(
     options =>
@@ -102,8 +107,9 @@ app.UseFastEndpoints(options =>
 
 app.UseDefaultFiles();
 
-app.UseStaticFiles(new StaticFileOptions() {
-    FileProvider =  new PhysicalFileProvider(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"wwwroot")),
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"wwwroot"))
 });
 
 if (app.Environment.IsDevelopment())
@@ -114,4 +120,6 @@ if (app.Environment.IsDevelopment())
 
 await app.RunAsync();
 
-public partial class Program { }
+public partial class Program
+{
+}
