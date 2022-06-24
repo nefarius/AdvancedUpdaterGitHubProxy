@@ -69,9 +69,9 @@ if (app.Environment.IsDevelopment())
 }
 
 List<IPAddress> knownProxies =
-    ((List<string>)configuration.GetSection("KnownProxies")).Select(IPAddress.Parse).ToList();
+    configuration.GetSection("KnownProxies").Get<List<string>>().Select(IPAddress.Parse).ToList();
 
-ForwardedHeadersOptions headerOptions = new ForwardedHeadersOptions
+ForwardedHeadersOptions headerOptions = new()
 {
     ForwardedHeaders = ForwardedHeaders.All, RequireHeaderSymmetry = false, ForwardLimit = null
 };
