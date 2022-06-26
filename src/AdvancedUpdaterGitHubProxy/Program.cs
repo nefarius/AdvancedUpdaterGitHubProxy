@@ -76,6 +76,8 @@ builder.Services.AddSwaggerDoc(addJWTBearerAuth: false);
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddMemoryCache();
+
 WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
