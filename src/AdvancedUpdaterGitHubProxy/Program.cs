@@ -5,10 +5,11 @@ using AdvancedUpdaterGitHubProxy.Extensions;
 
 using FastEndpoints.Swagger;
 
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.FileProviders;
 
-using Prometheus;
+//using Prometheus;
 
 using Serilog;
 using Serilog.Core;
@@ -42,6 +43,18 @@ builder.Services.AddLogging(b =>
 });
 
 builder.Services.AddSingleton(new LoggerFactory().AddSerilog(logger));
+
+builder.Services.AddW3CLogging(logging =>
+{
+    // Log all W3C fields
+    logging.LoggingFields = W3CLoggingFields.All;
+
+    logging.FileSizeLimit = 5 * 1024 * 1024;
+    logging.RetainedFileCountLimit = 30;
+    logging.FileName = "access.log";
+    logging.LogDirectory = @"logs";
+    logging.FlushInterval = TimeSpan.FromSeconds(2);
+});
 
 #endregion
 
@@ -100,8 +113,10 @@ app.UseSerilogRequestLogging(
         };
     });
 
-app.UseMetricServer();
-app.UseHttpMetrics();
+app.UseW3CLogging();
+
+//app.UseMetricServer();
+//app.UseHttpMetrics();
 
 app.UseAuthentication();
 app.UseAuthorization();
