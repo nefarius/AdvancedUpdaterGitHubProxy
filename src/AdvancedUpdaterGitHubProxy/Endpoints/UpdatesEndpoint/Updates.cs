@@ -1,19 +1,33 @@
-﻿namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 
 public class UpdatesRequest
 {
     public string Username { get; set; } = default!;
 
     public string Repository { get; set; } = default!;
+
+    public override string ToString()
+    {
+        return $"{Username}/{Repository}";
+    }
 }
 
 public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 {
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public UpdatesEndpoint(IHttpClientFactory httpClientFactory)
+    private readonly ILogger<UpdatesEndpoint> _logger;
+
+    private readonly IMemoryCache _memoryCache;
+
+    public UpdatesEndpoint(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
+        ILogger<UpdatesEndpoint> logger)
     {
         _httpClientFactory = httpClientFactory;
+        _memoryCache = memoryCache;
+        _logger = logger;
     }
 
     public override void Configure()
@@ -25,6 +39,16 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
     public override async Task HandleAsync(UpdatesRequest req, CancellationToken ct)
     {
+        if (_memoryCache.TryGetValue(req.ToString(), out string cached))
+        {
+            _logger.LogInformation("Returning cached response for {Request}", req.ToString());
+
+            await SendStringAsync(cached, cancellation: ct);
+            return;
+        }
+
+        _logger.LogInformation("Contacting GitHub API for {Request}", req.ToString());
+
         using HttpClient? client = _httpClientFactory.CreateClient();
 
         client.DefaultRequestHeaders.Add(
@@ -54,7 +78,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             await SendNotFoundAsync(ct);
             return;
         }
-        
+
         UpdaterInstructionsFile? instructions = release.UpdaterInstructions;
 
         if (instructions is null)
@@ -62,6 +86,11 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             await SendNotFoundAsync(ct);
             return;
         }
+
+        MemoryCacheEntryOptions? cacheEntryOptions = new MemoryCacheEntryOptions()
+            .SetSlidingExpiration(TimeSpan.FromHours(1));
+
+        _memoryCache.Set(req.ToString(), instructions.ToString(), cacheEntryOptions);
 
         await SendStringAsync(instructions.ToString(), cancellation: ct);
     }
