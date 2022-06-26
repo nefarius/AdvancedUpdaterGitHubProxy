@@ -88,7 +88,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         }
 
         MemoryCacheEntryOptions? cacheEntryOptions = new MemoryCacheEntryOptions()
-            .SetSlidingExpiration(TimeSpan.FromHours(1));
+            .SetAbsoluteExpiration(TimeSpan.FromHours(1));
 
         _memoryCache.Set(req.ToString(), instructions.ToString(), cacheEntryOptions);
 
