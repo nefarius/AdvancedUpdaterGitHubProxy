@@ -8,6 +8,8 @@ using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.FileProviders;
 
+using Prometheus;
+
 using Serilog;
 using Serilog.Core;
 
@@ -97,6 +99,9 @@ app.UseSerilogRequestLogging(
             diagnosticContext.Set("RemoteIpAddress", httpContext.Connection.RemoteIpAddress);
         };
     });
+
+app.UseMetricServer();
+app.UseHttpMetrics();
 
 app.UseAuthentication();
 app.UseAuthorization();
