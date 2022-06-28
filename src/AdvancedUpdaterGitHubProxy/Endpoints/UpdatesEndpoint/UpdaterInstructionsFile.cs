@@ -81,10 +81,10 @@ public class UpdaterInstructionsFile
             sb.AppendLine($"Flags = {Flags}");
         }
 
-        if (!string.IsNullOrEmpty(Replaces))
+        /*if (!string.IsNullOrEmpty(Replaces))
         {
             sb.AppendLine($"Replaces = {Replaces}");
-        }
+        }*/
 
         if (!string.IsNullOrEmpty(Depends))
         {
