@@ -34,6 +34,12 @@ public class UpdaterInstructionsFile
     /// </summary>
     public string? RegistryKey { get; set; }
 
+    public List<string> Features { get; set; } = new();
+
+    public List<string> Enhancements { get; set; } = new();
+    
+    public List<string> BugFixes { get; set; } = new();
+    
     public DateTime ReleaseDate { get; set; }
 
     public string Replaces { get; set; } = "All";

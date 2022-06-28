@@ -260,7 +260,7 @@ internal class Release
                 return null;
 
             block.Version = new Version(vm.Groups[1].Value);
-            block.Description = $"For the full changelog visit {HtmlUrl}";
+            block.Description = $"<a href=\"{HtmlUrl}\">Click to view the full changelog online.</a>";
 
             return block;
         }
