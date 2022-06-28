@@ -34,6 +34,8 @@ public class UpdaterInstructionsFile
     /// </summary>
     public string? RegistryKey { get; set; }
 
+    public DateTime ReleaseDate { get; set; }
+
     public string Replaces { get; set; } = "All";
 
     public string? Depends { get; set; } = default;
@@ -70,6 +72,7 @@ public class UpdaterInstructionsFile
         sb.AppendLine($"URL = {URL}");
         sb.AppendLine($"Size = {Size}");
         sb.AppendLine($"Version = {Version}");
+        sb.AppendLine($"ReleaseDate = {ReleaseDate.ToString("dd/MM/yyyy")}");
 
         if (!string.IsNullOrEmpty(RegistryKey))
         {

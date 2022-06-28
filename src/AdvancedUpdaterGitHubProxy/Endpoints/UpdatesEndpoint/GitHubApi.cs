@@ -252,7 +252,8 @@ internal class Release
             block.Name = Name;
             block.URL = asset.BrowserDownloadUrl;
             block.Size = asset.Size;
-            
+            block.ReleaseDate = PublishedAt;
+
             var vm = VersionRegex.Match(TagName);
 
             if (!vm.Success)
