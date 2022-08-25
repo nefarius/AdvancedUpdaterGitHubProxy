@@ -18,6 +18,12 @@ Request responses to the update configuration file URL get cached in memory for 
 Why should only Big Tech have all your data? 🤣 In all seriousness though, being able to generate statistics from access data while not being completely dependant on GitHub sure feels nice.
 - Easy to disable updates if something goes wrong  
 When something goes wrong (bug in an update) you can simply pull the service without having to touch the release properties.
+- Simplifies migration  
+Should the need arise to migrate releases away from GitHub you can do so without having to publish updates with a new URL, simply equip the proxy service with new backend logic and users won't notice a thing!
+
+## How to use
+
+It's recommended to build a Docker Container with the provided Dockerfile and spin it up with the example compose file. Should run fine on any cloud provider (or VM, bare metal) offering Docker support.
 
 ## 3rd party credits
 
