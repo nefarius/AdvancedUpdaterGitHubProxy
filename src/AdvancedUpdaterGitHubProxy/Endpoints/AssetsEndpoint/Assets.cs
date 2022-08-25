@@ -8,6 +8,8 @@ public class AssetsRequest
 
     public string Repository { get; set; } = default!;
 
+    public string Architecture { get; set; } = default!;
+
     public override string ToString()
     {
         return $"{Username}/{Repository}";
@@ -29,7 +31,8 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
     public override void Configure()
     {
         Verbs(Http.GET);
-        Routes("/api/github/{Username}/{Repository}/assets/latest");
+        Routes("/api/github/{Username}/{Repository}/assets/latest",
+            "/api/github/{Username}/{Repository}/assets/latest/{Architecture}");
         AllowAnonymous();
     }
 
@@ -67,7 +70,9 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
             return;
         }
 
-        Asset? asset = release.Assets.FirstOrDefault();
+        Asset? asset = string.IsNullOrEmpty(req.Architecture)
+            ? release.Assets.FirstOrDefault()
+            : release.Assets.FirstOrDefault(a => a.Name.Contains(req.Architecture, StringComparison.OrdinalIgnoreCase));
 
         if (asset is null)
         {
