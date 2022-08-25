@@ -1,3 +1,5 @@
+<img src="assets/NSS-128x128.png" align="right" />
+
 # AdvancedUpdaterGitHubProxy
 
 Builds an [Advanced Installer Updater](https://www.advancedinstaller.com/user-guide/updater.html) Configuration File from GitHub Releases.
