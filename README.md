@@ -19,4 +19,4 @@ When something goes wrong (bug in an update) you can simply pull the service wit
 
 ## 3rd party credits
 
-- [FastEndpoints](https://github.com/dj-nitehawk/FastEndpoints)
+- [FastEndpoints](https://github.com/FastEndpoints/Library)
