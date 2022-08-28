@@ -72,7 +72,8 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
 
         Asset? asset = string.IsNullOrEmpty(req.Architecture)
             ? release.Assets.FirstOrDefault()
-            : release.Assets.FirstOrDefault(a => a.Name.Contains(req.Architecture, StringComparison.OrdinalIgnoreCase));
+            : release.Assets.FirstOrDefault(a => a.Name.Contains(Path.GetFileNameWithoutExtension(req.Architecture),
+                StringComparison.OrdinalIgnoreCase));
 
         if (asset is null)
         {
