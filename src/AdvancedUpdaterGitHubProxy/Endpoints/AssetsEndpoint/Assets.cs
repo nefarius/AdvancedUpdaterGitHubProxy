@@ -94,7 +94,8 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
             stream,
             string.IsNullOrEmpty(req.Filename)
                 ? asset.Name
-                : req.Filename, asset.Size,
+                : req.Filename,
+            asset.Size,
             asset.ContentType,
             cancellation: ct
         );
