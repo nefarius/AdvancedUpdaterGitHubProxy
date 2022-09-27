@@ -34,12 +34,14 @@ public class UpdaterInstructionsFile
     /// </summary>
     public string? RegistryKey { get; set; }
 
+    public string? FilePath { get; set; }
+
     public List<string> Features { get; set; } = new();
 
     public List<string> Enhancements { get; set; } = new();
-    
+
     public List<string> BugFixes { get; set; } = new();
-    
+
     public DateTime ReleaseDate { get; set; }
 
     public string Replaces { get; set; } = "All";
@@ -80,7 +82,12 @@ public class UpdaterInstructionsFile
         sb.AppendLine($"Version = {Version}");
         sb.AppendLine($"ReleaseDate = {ReleaseDate.ToString("dd/MM/yyyy")}");
 
-        if (!string.IsNullOrEmpty(RegistryKey))
+        // Give file version check priority over registry key
+        if (!string.IsNullOrEmpty(FilePath))
+        {
+            sb.AppendLine($"FilePath = {FilePath}");
+        }
+        else if (!string.IsNullOrEmpty(RegistryKey))
         {
             sb.AppendLine($"RegistryKey = {RegistryKey}");
         }
