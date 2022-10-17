@@ -7,13 +7,11 @@ public class UpdatesRequest
     /// <summary>
     ///     The GitHub user or organization name.
     /// </summary>
-    [QueryParam]
     public string Username { get; set; } = default!;
 
     /// <summary>
     ///     The GitHub repository name.
     /// </summary>
-    [QueryParam]
     public string Repository { get; set; } = default!;
 
     public override string ToString()

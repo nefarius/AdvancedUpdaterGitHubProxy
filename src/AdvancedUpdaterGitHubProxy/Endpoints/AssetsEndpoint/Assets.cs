@@ -7,26 +7,22 @@ public class AssetsRequest
     /// <summary>
     ///     The GitHub user or organization name.
     /// </summary>
-    [QueryParam]
     public string Username { get; set; } = default!;
 
     /// <summary>
     ///     The GitHub repository name.
     /// </summary>
-    [QueryParam]
     public string Repository { get; set; } = default!;
 
     /// <summary>
     ///     Optional architecture. Valid values include: x86, x64 and arm64.
     /// </summary>
-    [QueryParam]
     public string? Architecture { get; set; } = default!;
 
     /// <summary>
     ///     Optional filename the response should use. Some clients can't handle the URL not ending with a "real" file name, so
     ///     this value will be reflected in the response.
     /// </summary>
-    [QueryParam]
     public string? Filename { get; set; } = default!;
 
     public override string ToString()
