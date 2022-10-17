@@ -56,8 +56,8 @@ builder.Services.AddW3CLogging(logging =>
     // Log all W3C fields
     logging.LoggingFields = W3CLoggingFields.All;
 
-    logging.FileSizeLimit = 5 * 1024 * 1024;
-    logging.RetainedFileCountLimit = 30;
+    logging.FileSizeLimit = 100 * 1024 * 1024;
+    logging.RetainedFileCountLimit = 90;
     logging.FileName = "access-";
     logging.LogDirectory = @"logs";
     logging.FlushInterval = TimeSpan.FromSeconds(2);

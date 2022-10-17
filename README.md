@@ -27,6 +27,16 @@ Should the need arise to migrate releases away from GitHub you can do so without
 
 It's recommended to build a Docker Container with the provided Dockerfile and spin it up with the example compose file. Should run fine on any cloud provider (or VM, bare metal) offering Docker support.
 
+## W3C log analysis
+
+Two types of logs get produced in the `./logs` subdirectory during normal operation; a `server-*.log` which logs all normal application events and errors and gets cycled daily and `access-*.txt` access logs in W3C format. The latter can be visualized with [GoAccess](https://goaccess.io/) using the following custom log filter:
+
+```bash
+goaccess -c logs/access-20221017.0002.txt --date-format='%Y-%m-%d' --time-format='%H:%M:%S' --log-format='%d %t %h %^ %^ %^ %^ %m %U %^ %s %L %^ %v %u %^ %^'
+```
+
+For more options like HTML report generation [consult their FAQ](https://goaccess.io/faq).
+
 ## 3rd party credits
 
 - [FastEndpoints](https://github.com/FastEndpoints/Library)
