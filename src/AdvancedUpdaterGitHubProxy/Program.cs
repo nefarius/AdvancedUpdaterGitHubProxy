@@ -1,22 +1,25 @@
 using System.Collections;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text.Json;
 
 using AdvancedUpdaterGitHubProxy.Extensions;
 
 using FastEndpoints.Swagger;
 
-using FluentValidation.Results;
-
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.FileProviders;
 
-//using Prometheus;
+using Polly;
+using Polly.Contrib.WaitAndRetry;
 
 using Serilog;
 using Serilog.Core;
+
+//using Prometheus;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -78,7 +81,12 @@ builder.Services.AddFastEndpoints(options =>
 
 builder.Services.AddSwaggerDoc(addJWTBearerAuth: false);
 
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("GitHub", client =>
+    {
+        client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("AdvancedUpdaterGitHubProxy", "1"));
+    })
+    .AddTransientHttpErrorPolicy(pb =>
+        pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
 
 builder.Services.AddMemoryCache();
 
@@ -91,12 +99,10 @@ if (app.Environment.IsDevelopment())
 
 ForwardedHeadersOptions headerOptions = new()
 {
-    ForwardedHeaders = ForwardedHeaders.All,
-    RequireHeaderSymmetry = false,
-    ForwardLimit = null
+    ForwardedHeaders = ForwardedHeaders.All, RequireHeaderSymmetry = false, ForwardLimit = null
 };
 
-foreach (var proxy in GetNetworks(NetworkInterfaceType.Ethernet))
+foreach (IPNetwork proxy in GetNetworks(NetworkInterfaceType.Ethernet))
 {
     headerOptions.KnownNetworks.Add(proxy);
 }
@@ -150,45 +156,51 @@ public partial class Program
 {
     private static IEnumerable<IPNetwork> GetNetworks(NetworkInterfaceType type)
     {
-
-        foreach (var item in NetworkInterface.GetAllNetworkInterfaces()
-                     .Where(n => n.NetworkInterfaceType == type && n.OperationalStatus == OperationalStatus.Up)  // get all operational networks of a given type
-                     .Select(n => n.GetIPProperties())   // get the IPs
+        foreach (IPInterfaceProperties item in NetworkInterface.GetAllNetworkInterfaces()
+                     .Where(n => n.NetworkInterfaceType == type &&
+                                 n.OperationalStatus ==
+                                 OperationalStatus.Up) // get all operational networks of a given type
+                     .Select(n => n.GetIPProperties()) // get the IPs
                      .Where(n => n.GatewayAddresses.Any())) // where the IPs have a gateway defined
         {
-            var ipInfo = item.UnicastAddresses.FirstOrDefault(i => i.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork); // get the first cluster-facing IP address
+            UnicastIPAddressInformation? ipInfo =
+                item.UnicastAddresses.FirstOrDefault(i =>
+                    i.Address.AddressFamily == AddressFamily.InterNetwork); // get the first cluster-facing IP address
             if (ipInfo == null) { continue; }
 
             // convert the mask to bits
-            var maskBytes = ipInfo.IPv4Mask.GetAddressBytes();
+            byte[] maskBytes = ipInfo.IPv4Mask.GetAddressBytes();
             if (!BitConverter.IsLittleEndian)
             {
                 Array.Reverse(maskBytes);
             }
-            var maskBits = new BitArray(maskBytes);
+
+            BitArray maskBits = new(maskBytes);
 
             // count the number of "true" bits to get the CIDR mask
-            var cidrMask = maskBits.Cast<bool>().Count(b => b);
+            int cidrMask = maskBits.Cast<bool>().Count(b => b);
 
             // convert my application's ip address to bits
-            var ipBytes = ipInfo.Address.GetAddressBytes();
+            byte[] ipBytes = ipInfo.Address.GetAddressBytes();
             if (!BitConverter.IsLittleEndian)
             {
                 Array.Reverse(maskBytes);
             }
-            var ipBits = new BitArray(ipBytes);
+
+            BitArray ipBits = new(ipBytes);
 
             // and the bits with the mask to get the start of the range
-            var maskedBits = ipBits.And(maskBits);
+            BitArray maskedBits = ipBits.And(maskBits);
 
             // Convert the masked IP back into an IP address
-            var maskedIpBytes = new byte[4];
+            byte[] maskedIpBytes = new byte[4];
             maskedBits.CopyTo(maskedIpBytes, 0);
             if (!BitConverter.IsLittleEndian)
             {
                 Array.Reverse(maskedIpBytes);
             }
-            var rangeStartIp = new IPAddress(maskedIpBytes);
+
+            IPAddress rangeStartIp = new(maskedIpBytes);
 
             // return the start IP and CIDR mask
             yield return new IPNetwork(rangeStartIp, cidrMask);

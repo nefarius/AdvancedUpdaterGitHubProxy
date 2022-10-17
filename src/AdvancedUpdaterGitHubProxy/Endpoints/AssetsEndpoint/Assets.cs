@@ -44,7 +44,7 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
     {
         _logger.LogInformation("Contacting GitHub API for {Request}", req.ToString());
 
-        using HttpClient? client = _httpClientFactory.CreateClient();
+        using HttpClient? client = _httpClientFactory.CreateClient("GitHub");
 
         client.DefaultRequestHeaders.Add(
             "User-Agent",
