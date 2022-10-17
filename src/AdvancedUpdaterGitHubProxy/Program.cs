@@ -91,7 +91,9 @@ if (app.Environment.IsDevelopment())
 
 ForwardedHeadersOptions headerOptions = new()
 {
-    ForwardedHeaders = ForwardedHeaders.All, RequireHeaderSymmetry = false, ForwardLimit = null
+    ForwardedHeaders = ForwardedHeaders.All,
+    RequireHeaderSymmetry = false,
+    ForwardLimit = null
 };
 
 foreach (var proxy in GetNetworks(NetworkInterfaceType.Ethernet))
@@ -138,11 +140,9 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"wwwroot"))
 });
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseOpenApi();
-    app.UseSwaggerUi3(x => x.ConfigureDefaults());
-}
+
+app.UseOpenApi();
+app.UseSwaggerUi3(x => x.ConfigureDefaults());
 
 await app.RunAsync();
 
@@ -168,7 +168,7 @@ public partial class Program
             var maskBits = new BitArray(maskBytes);
 
             // count the number of "true" bits to get the CIDR mask
-            var cidrMask = maskBits.Cast<bool>().Count(b => b); 
+            var cidrMask = maskBits.Cast<bool>().Count(b => b);
 
             // convert my application's ip address to bits
             var ipBytes = ipInfo.Address.GetAddressBytes();
