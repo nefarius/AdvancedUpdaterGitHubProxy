@@ -96,6 +96,8 @@ builder.Services.AddMemoryCache();
 
 WebApplication app = builder.Build();
 
+app.UseW3CLogging();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDefaultExceptionHandler();
@@ -129,8 +131,6 @@ app.UseSerilogRequestLogging(
             diagnosticContext.Set("RemoteIpAddress", httpContext.Connection.RemoteIpAddress);
         };
     });
-
-app.UseW3CLogging();
 
 //app.UseMetricServer();
 //app.UseHttpMetrics();
