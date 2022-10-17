@@ -4,12 +4,28 @@ namespace AdvancedUpdaterGitHubProxy.Endpoints.AssetsEndpoint;
 
 public class AssetsRequest
 {
+    /// <summary>
+    ///     The GitHub user or organization name.
+    /// </summary>
+    [QueryParam]
     public string Username { get; set; } = default!;
 
+    /// <summary>
+    ///     The GitHub repository name.
+    /// </summary>
+    [QueryParam]
     public string Repository { get; set; } = default!;
 
+    /// <summary>
+    ///     Optional architecture. Valid values include: x86, x64 and arm64.
+    /// </summary>
+    [QueryParam]
     public string Architecture { get; set; } = default!;
 
+    /// <summary>
+    ///     Optional asset name. The first found asset is returned, if omitted.
+    /// </summary>
+    [QueryParam]
     public string Filename { get; set; } = default!;
 
     public override string ToString()
@@ -33,7 +49,8 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
     public override void Configure()
     {
         Verbs(Http.GET);
-        Routes("/api/github/{Username}/{Repository}/assets/latest",
+        Routes(
+            "/api/github/{Username}/{Repository}/assets/latest",
             "/api/github/{Username}/{Repository}/assets/latest/{Architecture}",
             "/api/github/{Username}/{Repository}/assets/latest/{Architecture}/{Filename}"
         );
@@ -45,13 +62,6 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
         _logger.LogInformation("Contacting GitHub API for {Request}", req.ToString());
 
         using HttpClient? client = _httpClientFactory.CreateClient("GitHub");
-
-        client.DefaultRequestHeaders.Add(
-            "User-Agent",
-            "Mozilla/4.0 (Compatible; Windows NT 5.1; MSIE 6.0) " +
-            "(compatible; MSIE 6.0; Windows NT 5.1; " +
-            ".NET CLR 1.1.4322; .NET CLR 2.0.50727)"
-        );
 
         List<Release>? response = await client.GetFromJsonAsync<List<Release>>(
             $"https://api.github.com/repos/{req.Username}/{req.Repository}/releases",

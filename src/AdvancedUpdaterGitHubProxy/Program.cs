@@ -79,7 +79,11 @@ builder.Services.AddFastEndpoints(options =>
     options.SourceGeneratorDiscoveredTypes = DiscoveredTypes.All;
 });
 
-builder.Services.AddSwaggerDoc(addJWTBearerAuth: false);
+builder.Services.AddSwaggerDoc(settings =>
+{
+    settings.Title = "Nefarius' Advanced Updater GitHub Proxy Service";
+    settings.Version = "v1";
+});
 
 builder.Services.AddHttpClient("GitHub", client =>
     {
@@ -99,7 +103,9 @@ if (app.Environment.IsDevelopment())
 
 ForwardedHeadersOptions headerOptions = new()
 {
-    ForwardedHeaders = ForwardedHeaders.All, RequireHeaderSymmetry = false, ForwardLimit = null
+    ForwardedHeaders = ForwardedHeaders.All,
+    RequireHeaderSymmetry = false,
+    ForwardLimit = null
 };
 
 foreach (IPNetwork proxy in GetNetworks(NetworkInterfaceType.Ethernet))

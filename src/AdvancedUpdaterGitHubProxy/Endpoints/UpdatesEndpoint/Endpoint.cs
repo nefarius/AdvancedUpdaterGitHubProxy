@@ -4,8 +4,16 @@ namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 
 public class UpdatesRequest
 {
+    /// <summary>
+    ///     The GitHub user or organization name.
+    /// </summary>
+    [QueryParam]
     public string Username { get; set; } = default!;
 
+    /// <summary>
+    ///     The GitHub repository name.
+    /// </summary>
+    [QueryParam]
     public string Repository { get; set; } = default!;
 
     public override string ToString()
@@ -50,13 +58,6 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         _logger.LogInformation("Contacting GitHub API for {Request}", req.ToString());
 
         using HttpClient? client = _httpClientFactory.CreateClient("GitHub");
-
-        client.DefaultRequestHeaders.Add(
-            "User-Agent",
-            "Mozilla/4.0 (Compatible; Windows NT 5.1; MSIE 6.0) " +
-            "(compatible; MSIE 6.0; Windows NT 5.1; " +
-            ".NET CLR 1.1.4322; .NET CLR 2.0.50727)"
-        );
 
         List<Release>? response = await client.GetFromJsonAsync<List<Release>>(
             $"https://api.github.com/repos/{req.Username}/{req.Repository}/releases",
