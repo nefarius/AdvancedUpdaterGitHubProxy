@@ -7,6 +7,8 @@ using AdvancedUpdaterGitHubProxy.Extensions;
 
 using FastEndpoints.Swagger;
 
+using FluentValidation.Results;
+
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.FileProviders;
@@ -126,7 +128,7 @@ app.UseFastEndpoints(options =>
 {
     options.Serializer.Options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     options.Errors.StatusCode = StatusCodes.Status422UnprocessableEntity;
-    options.Errors.ResponseBuilder = (failures, _) => failures.ToResponse();
+    options.Errors.ResponseBuilder = (list, context, arg3) => list.ToResponse();
 });
 
 app.UseDefaultFiles();
