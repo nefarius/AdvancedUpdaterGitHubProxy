@@ -20,13 +20,14 @@ public class AssetsRequest
     ///     Optional architecture. Valid values include: x86, x64 and arm64.
     /// </summary>
     [QueryParam]
-    public string Architecture { get; set; } = default!;
+    public string? Architecture { get; set; } = default!;
 
     /// <summary>
-    ///     Optional asset name. The first found asset is returned, if omitted.
+    ///     Optional filename the response should use. Some clients can't handle the URL not ending with a "real" file name, so
+    ///     this value will be reflected in the response.
     /// </summary>
     [QueryParam]
-    public string Filename { get; set; } = default!;
+    public string? Filename { get; set; } = default!;
 
     public override string ToString()
     {
