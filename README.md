@@ -30,3 +30,4 @@ It's recommended to build a Docker Container with the provided Dockerfile and sp
 ## 3rd party credits
 
 - [FastEndpoints](https://github.com/FastEndpoints/Library)
+- [Polly](https://github.com/App-vNext/Polly)
