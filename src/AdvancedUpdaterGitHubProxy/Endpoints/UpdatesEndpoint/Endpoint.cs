@@ -41,6 +41,14 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         Verbs(Http.GET);
         Routes("/api/github/{Username}/{Repository}/updates");
         AllowAnonymous();
+        Summary(s =>
+        {
+            s.Summary = "Returns Advanced Installer Updater Configuration";
+            s.Description =
+                "Contacts the GitHub API, fetches the latest public release and transforms it into an Advanced Installer Updater compatible INI configuration file.";
+            s.Responses[200] = "The updater configuration was returned successfully.";
+            s.Responses[404] = "No public release was found.";
+        });
     }
 
     public override async Task HandleAsync(UpdatesRequest req, CancellationToken ct)

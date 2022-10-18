@@ -52,6 +52,14 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
             "/api/github/{Username}/{Repository}/assets/latest/{Architecture}/{Filename}"
         );
         AllowAnonymous();
+        Summary(s =>
+        {
+            s.Summary = "Returns an asset from a GitHub release";
+            s.Description =
+                "Contacts the GitHub API, fetches the latest public release and returns the first found asset, if any.";
+            s.Responses[200] = "The asset was returned successfully.";
+            s.Responses[404] = "No public release was found.";
+        });
     }
 
     public override async Task HandleAsync(AssetsRequest req, CancellationToken ct)
