@@ -2,7 +2,7 @@
 
 # AdvancedUpdaterGitHubProxy
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/nefarius/AdvancedUpdaterGitHubProxy/Docker%20Image%20CI)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nefarius/AdvancedUpdaterGitHubProxy/docker-image.yml)
 
 Builds an [Advanced Installer Updater](https://www.advancedinstaller.com/user-guide/updater.html) Configuration File from GitHub Releases.
 
