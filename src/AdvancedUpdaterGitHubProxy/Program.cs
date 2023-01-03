@@ -96,8 +96,6 @@ builder.Services.AddMemoryCache();
 
 WebApplication app = builder.Build();
 
-app.UseW3CLogging();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseDefaultExceptionHandler();
@@ -116,6 +114,8 @@ foreach (IPNetwork proxy in GetNetworks(NetworkInterfaceType.Ethernet))
 }
 
 app.UseForwardedHeaders(headerOptions);
+
+app.UseW3CLogging();
 
 app.UseSerilogRequestLogging(
     options =>
