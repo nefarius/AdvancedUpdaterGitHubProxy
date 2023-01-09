@@ -38,8 +38,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
     public override void Configure()
     {
-        Verbs(Http.GET);
-        Routes("/api/github/{Username}/{Repository}/updates");
+        Get("/api/github/{Username}/{Repository}/updates");
         AllowAnonymous();
         Summary(s =>
         {
@@ -53,11 +52,11 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
     public override async Task HandleAsync(UpdatesRequest req, CancellationToken ct)
     {
-        if (_memoryCache.TryGetValue(req.ToString(), out string cached))
+        if (_memoryCache.TryGetValue(req.ToString(), out string? cached))
         {
             _logger.LogInformation("Returning cached response for {Request}", req.ToString());
 
-            await SendStringAsync(cached, cancellation: ct);
+            await SendStringAsync(cached!, cancellation: ct);
             return;
         }
 
