@@ -14,9 +14,7 @@ using Polly.Contrib.WaitAndRetry;
 
 //using Prometheus;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
-builder.Setup();
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args).Setup();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -47,14 +45,12 @@ builder.Services.AddHttpClient("GitHub", client =>
 
 builder.Services.AddMemoryCache();
 
-WebApplication app = builder.Build();
+WebApplication app = builder.Build().Setup();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDefaultExceptionHandler();
 }
-
-app.Setup();
 
 //app.UseMetricServer();
 //app.UseHttpMetrics();
