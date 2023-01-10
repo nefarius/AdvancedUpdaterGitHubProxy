@@ -52,7 +52,9 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
     public override async Task HandleAsync(UpdatesRequest req, CancellationToken ct)
     {
-        if (_memoryCache.TryGetValue(req.ToString(), out string? cached))
+        var asJson = Query<bool>("asJson", false);
+
+        if (_memoryCache.TryGetValue(req.ToString(), out string cached))
         {
             _logger.LogInformation("Returning cached response for {Request}", req.ToString());
 
@@ -62,9 +64,9 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         _logger.LogInformation("Contacting GitHub API for {Request}", req.ToString());
 
-        using HttpClient? client = _httpClientFactory.CreateClient("GitHub");
+        using HttpClient client = _httpClientFactory.CreateClient("GitHub");
 
-        List<Release>? response = await client.GetFromJsonAsync<List<Release>>(
+        List<Release> response = await client.GetFromJsonAsync<List<Release>>(
             $"https://api.github.com/repos/{req.Username}/{req.Repository}/releases",
             ct
         );
@@ -77,7 +79,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         IOrderedEnumerable<Release> releases = response.OrderByDescending(release => release.CreatedAt);
 
-        Release? release = releases.FirstOrDefault(r => r.UpdaterInstructions is not null);
+        Release release = releases.FirstOrDefault(r => r.UpdaterInstructions is not null);
 
         if (release is null)
         {
@@ -85,7 +87,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             return;
         }
 
-        UpdaterInstructionsFile? instructions = release.UpdaterInstructions;
+        UpdaterInstructionsFile instructions = release.UpdaterInstructions;
 
         if (instructions is null)
         {
@@ -93,7 +95,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             return;
         }
 
-        MemoryCacheEntryOptions? cacheEntryOptions = new MemoryCacheEntryOptions()
+        MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions()
             .SetAbsoluteExpiration(TimeSpan.FromHours(1));
 
         _memoryCache.Set(req.ToString(), instructions.ToString(), cacheEntryOptions);

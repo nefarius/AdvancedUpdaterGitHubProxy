@@ -1,8 +1,12 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 
-public class UpdaterInstructionsFile
+[SuppressMessage("ReSharper", "CollectionNeverUpdated.Global")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+internal sealed class UpdaterInstructionsFile
 {
     /// <summary>
     ///     The name of the new release.
@@ -12,7 +16,7 @@ public class UpdaterInstructionsFile
     /// <summary>
     ///     The direct download URL to the new setup.
     /// </summary>
-    public string URL { get; set; }
+    public string Url { get; set; }
 
     /// <summary>
     ///     The size - in bytes - of the setup on the server.
@@ -32,9 +36,9 @@ public class UpdaterInstructionsFile
     /// <summary>
     ///     If set the registry key where the installed application version information can be found.
     /// </summary>
-    public string? RegistryKey { get; set; }
+    public string RegistryKey { get; set; }
 
-    public string? FilePath { get; set; }
+    public string FilePath { get; set; }
 
     public List<string> Features { get; set; } = new();
 
@@ -46,16 +50,16 @@ public class UpdaterInstructionsFile
 
     public string Replaces { get; set; } = "All";
 
-    public string? Depends { get; set; } = default;
+    public string Depends { get; set; } = default;
 
-    public string? NextDeprecated { get; set; } = default;
+    public string NextDeprecated { get; set; } = default;
 
-    public string? Flags { get; set; } = default;
+    public string Flags { get; set; } = default;
 
     /// <summary>
     ///     The description of the new release.
     /// </summary>
-    public string? Description { get; set; }
+    public string Description { get; set; }
 
     /// <summary>
     ///     Creates the body of the updater INI file.
@@ -77,7 +81,7 @@ public class UpdaterInstructionsFile
         sb.AppendLine($"[{Name}]");
         sb.AppendLine($"Name = {Name}");
         sb.AppendLine($"Description = {Description}");
-        sb.AppendLine($"URL = {URL}");
+        sb.AppendLine($"URL = {Url}");
         sb.AppendLine($"Size = {Size}");
         sb.AppendLine($"Version = {Version}");
         sb.AppendLine($"ReleaseDate = {ReleaseDate.ToString("dd/MM/yyyy")}");

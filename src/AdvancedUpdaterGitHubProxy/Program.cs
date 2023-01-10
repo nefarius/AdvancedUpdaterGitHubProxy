@@ -65,13 +65,13 @@ app.UseFastEndpoints(options =>
     options.Errors.ResponseBuilder = (list, context, arg3) => list.ToResponse();
 });
 
-app.UseDefaultFiles();
-
-app.UseStaticFiles(new StaticFileOptions
+if (app.Environment.IsProduction())
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"wwwroot"))
-});
+    string wwwroot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"wwwroot");
 
+    app.UseDefaultFiles();
+    app.UseStaticFiles(new StaticFileOptions { FileProvider = new PhysicalFileProvider(wwwroot) });
+}
 
 app.UseOpenApi();
 app.UseSwaggerUi3(x => x.ConfigureDefaults());

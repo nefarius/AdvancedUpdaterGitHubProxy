@@ -1,7 +1,10 @@
-﻿using AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
+﻿using System.Diagnostics.CodeAnalysis;
+
+using AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 
 namespace AdvancedUpdaterGitHubProxy.Endpoints.AssetsEndpoint;
 
+[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
 public class AssetsRequest
 {
     /// <summary>
@@ -17,13 +20,13 @@ public class AssetsRequest
     /// <summary>
     ///     Optional architecture. Valid values include: x86, x64 and arm64.
     /// </summary>
-    public string? Architecture { get; set; } = default!;
+    public string Architecture { get; set; } = default!;
 
     /// <summary>
     ///     Optional filename the response should use. Some clients can't handle the URL not ending with a "real" file name, so
     ///     this value will be reflected in the response.
     /// </summary>
-    public string? Filename { get; set; } = default!;
+    public string Filename { get; set; } = default!;
 
     public override string ToString()
     {
@@ -66,9 +69,9 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
     {
         _logger.LogInformation("Contacting GitHub API for {Request}", req.ToString());
 
-        using HttpClient? client = _httpClientFactory.CreateClient("GitHub");
+        using HttpClient client = _httpClientFactory.CreateClient("GitHub");
 
-        List<Release>? response = await client.GetFromJsonAsync<List<Release>>(
+        List<Release> response = await client.GetFromJsonAsync<List<Release>>(
             $"https://api.github.com/repos/{req.Username}/{req.Repository}/releases",
             ct
         );
@@ -81,7 +84,7 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
 
         IOrderedEnumerable<Release> releases = response.OrderByDescending(release => release.CreatedAt);
 
-        Release? release = releases.FirstOrDefault();
+        Release release = releases.FirstOrDefault();
 
         if (release is null)
         {
@@ -89,7 +92,7 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
             return;
         }
 
-        Asset? asset = string.IsNullOrEmpty(req.Architecture)
+        Asset asset = string.IsNullOrEmpty(req.Architecture)
             ? release.Assets.FirstOrDefault()
             : release.Assets.FirstOrDefault(a => a.Name.Contains(req.Architecture, StringComparison.OrdinalIgnoreCase));
 

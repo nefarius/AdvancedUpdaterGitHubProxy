@@ -1,10 +1,12 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 
-internal class Author
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+internal sealed class Author
 {
     [JsonPropertyName("login")]
     public string Login { get; set; }
@@ -61,7 +63,8 @@ internal class Author
     public bool SiteAdmin { get; set; }
 }
 
-internal class Uploader
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+internal sealed class Uploader
 {
     [JsonPropertyName("login")]
     public string Login { get; set; }
@@ -118,7 +121,9 @@ internal class Uploader
     public bool SiteAdmin { get; set; }
 }
 
-internal class Asset
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+internal sealed class Asset
 {
     [JsonPropertyName("url")]
     public string Url { get; set; }
@@ -160,7 +165,12 @@ internal class Asset
     public string BrowserDownloadUrl { get; set; }
 }
 
-internal class Release
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+[SuppressMessage("ReSharper", "CollectionNeverUpdated.Global")]
+internal sealed class Release
 {
     private static readonly Regex InstructionBlockRegex = new(@"^<!--([\s\S]*?)-->", RegexOptions.Singleline);
 
@@ -221,11 +231,11 @@ internal class Release
     public string Body { get; set; }
 
     [JsonIgnore]
-    public UpdaterInstructionsFile? UpdaterInstructions
+    public UpdaterInstructionsFile UpdaterInstructions
     {
         get
         {
-            Asset? asset = Assets.FirstOrDefault();
+            Asset asset = Assets.FirstOrDefault();
 
             if (asset is null)
             {
@@ -240,7 +250,7 @@ internal class Release
             }
 
             // Get properties not available in GitHub API by parsing embedded JSON
-            UpdaterInstructionsFile? block = JsonSerializer.Deserialize<UpdaterInstructionsFile>(m.Groups[1].Value,
+            UpdaterInstructionsFile block = JsonSerializer.Deserialize<UpdaterInstructionsFile>(m.Groups[1].Value,
                 new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
             if (block is null)
@@ -250,14 +260,16 @@ internal class Release
 
             // Merge in properties directly available from the release
             block.Name = Name;
-            block.URL = asset.BrowserDownloadUrl;
+            block.Url = asset.BrowserDownloadUrl;
             block.Size = asset.Size;
             block.ReleaseDate = PublishedAt;
 
-            var vm = VersionRegex.Match(TagName);
+            Match vm = VersionRegex.Match(TagName);
 
             if (!vm.Success)
+            {
                 return null;
+            }
 
             block.Version = new Version(vm.Groups[1].Value);
             block.Description = $"<a href=\"{HtmlUrl}\">Click to view the full changelog online.</a>";
