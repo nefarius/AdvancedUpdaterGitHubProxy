@@ -43,6 +43,10 @@ Put a comment block like below at the top of every GitHub release Markdown body,
 
 ❗ The content of the comment block must be valid JSON in camelCase.
 
+## Get JSON response
+
+If you'd like to get the latest cached release as original JSON (same schema as GitHub's API response) simply add the `?asJson=true` query parameter.
+
 ## W3C log analysis
 
 Two types of logs get produced in the `./logs` subdirectory during normal operation; a `server-*.log` which logs all normal application events and errors and gets cycled daily and `access-*.txt` access logs in W3C format. The latter can be visualized with [GoAccess](https://goaccess.io/) using the following custom log filter:
