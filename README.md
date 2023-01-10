@@ -27,6 +27,22 @@ Should the need arise to migrate releases away from GitHub you can do so without
 
 It's recommended to build a Docker Container with the provided Dockerfile and spin it up with the example compose file. Should run fine on any cloud provider (or VM, bare metal) offering Docker support.
 
+## Enriched release Markdown example
+
+Put a comment block like below at the top of every GitHub release Markdown body, those will get parsed and merged automatically into the API response when requested:
+
+```md
+<!--
+{
+  "available": true,
+  "registryKey": "HKUD\\Software\\Nefarius Software Solutions e.U.\\ViGEm Bus Driver\\Version",
+  "flags": "NoRedetect"
+}
+-->
+```
+
+❗ The content of the comment block must be valid JSON in camelCase.
+
 ## W3C log analysis
 
 Two types of logs get produced in the `./logs` subdirectory during normal operation; a `server-*.log` which logs all normal application events and errors and gets cycled daily and `access-*.txt` access logs in W3C format. The latter can be visualized with [GoAccess](https://goaccess.io/) using the following custom log filter:
