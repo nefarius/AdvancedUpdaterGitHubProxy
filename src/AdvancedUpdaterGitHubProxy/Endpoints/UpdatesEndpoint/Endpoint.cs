@@ -52,13 +52,21 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
     public override async Task HandleAsync(UpdatesRequest req, CancellationToken ct)
     {
-        var asJson = Query<bool>("asJson", false);
+        bool asJson = Query<bool>("asJson", false);
 
-        if (_memoryCache.TryGetValue(req.ToString(), out string cached))
+        if (_memoryCache.TryGetValue(req.ToString(), out Release cached))
         {
             _logger.LogInformation("Returning cached response for {Request}", req.ToString());
 
-            await SendStringAsync(cached!, cancellation: ct);
+            if (asJson)
+            {
+                await SendOkAsync(cached, ct);
+            }
+            else
+            {
+                await SendStringAsync(cached.UpdaterInstructions.ToString(), cancellation: ct);
+            }
+
             return;
         }
 
@@ -67,7 +75,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         using HttpClient client = _httpClientFactory.CreateClient("GitHub");
 
         List<Release> response = await client.GetFromJsonAsync<List<Release>>(
-            $"https://api.github.com/repos/{req.Username}/{req.Repository}/releases",
+            $"repos/{req.Username}/{req.Repository}/releases",
             ct
         );
 
@@ -87,6 +95,12 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             return;
         }
 
+        if (asJson)
+        {
+            await SendOkAsync(release, ct);
+            return;
+        }
+
         UpdaterInstructionsFile instructions = release.UpdaterInstructions;
 
         if (instructions is null)
@@ -98,7 +112,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions()
             .SetAbsoluteExpiration(TimeSpan.FromHours(1));
 
-        _memoryCache.Set(req.ToString(), instructions.ToString(), cacheEntryOptions);
+        _memoryCache.Set(req.ToString(), release, cacheEntryOptions);
 
         await SendStringAsync(instructions.ToString(), cancellation: ct);
     }

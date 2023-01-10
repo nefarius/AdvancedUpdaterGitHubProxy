@@ -38,6 +38,7 @@ builder.Services.AddSwaggerDoc(settings =>
 
 builder.Services.AddHttpClient("GitHub", client =>
     {
+        client.BaseAddress = new Uri("https://api.github.com/");
         client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("AdvancedUpdaterGitHubProxy", "1"));
     })
     .AddTransientHttpErrorPolicy(pb =>
