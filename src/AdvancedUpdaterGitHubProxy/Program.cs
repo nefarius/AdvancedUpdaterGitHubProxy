@@ -12,7 +12,7 @@ using Nefarius.Utilities.AspNetCore;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 
-//using Prometheus;
+using Prometheus;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args).Setup();
 
@@ -46,6 +46,11 @@ builder.Services.AddHttpClient("GitHub", client =>
 
 builder.Services.AddMemoryCache();
 
+builder.Services.AddMetricServer(options =>
+{
+    options.Port = 1337;
+});
+
 WebApplication app = builder.Build().Setup();
 
 if (app.Environment.IsDevelopment())
@@ -53,8 +58,7 @@ if (app.Environment.IsDevelopment())
     app.UseDefaultExceptionHandler();
 }
 
-//app.UseMetricServer();
-//app.UseHttpMetrics();
+app.UseHttpMetrics();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -65,6 +69,8 @@ app.UseFastEndpoints(options =>
     options.Errors.StatusCode = StatusCodes.Status422UnprocessableEntity;
     options.Errors.ResponseBuilder = (list, context, arg3) => list.ToResponse();
 });
+
+app.MapMetrics();
 
 if (app.Environment.IsProduction())
 {
