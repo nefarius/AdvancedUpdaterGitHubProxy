@@ -61,3 +61,4 @@ For more options like HTML report generation [consult their FAQ](https://goacces
 
 - [FastEndpoints](https://github.com/FastEndpoints/Library)
 - [Polly](https://github.com/App-vNext/Polly)
+- [prometheus-net](https://github.com/prometheus-net/prometheus-net)
