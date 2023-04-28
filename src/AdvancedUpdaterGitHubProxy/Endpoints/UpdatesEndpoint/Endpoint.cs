@@ -59,7 +59,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         if (_memoryCache.TryGetValue(req.ToString(), out Release cached))
         {
-            _logger.LogInformation("Returning cached response for {Request}", req.ToString());
+            _logger.LogDebug("Returning cached response for {Request}", req.ToString());
 
             if (asJson)
             {
