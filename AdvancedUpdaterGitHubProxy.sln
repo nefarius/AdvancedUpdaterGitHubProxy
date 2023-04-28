@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A7B1E56F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A9CED488-D3A4-4556-A93D-0511C8ABF1D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedUpdaterGitHubProxy", "src\AdvancedUpdaterGitHubProxy\AdvancedUpdaterGitHubProxy.csproj", "{8849DB04-EE08-4A25-A847-846E1A002413}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedUpdaterGitHubProxy", "src\AdvancedUpdaterGitHubProxy.csproj", "{8849DB04-EE08-4A25-A847-846E1A002413}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{64147DD2-B7F8-41AC-B4B8-DD3CF38FEE7F}"
 	ProjectSection(SolutionItems) = preProject

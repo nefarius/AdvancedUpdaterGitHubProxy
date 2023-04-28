@@ -7,10 +7,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["src/AdvancedUpdaterGitHubProxy/AdvancedUpdaterGitHubProxy.csproj", "src/AdvancedUpdaterGitHubProxy/"]
-RUN dotnet restore "src/AdvancedUpdaterGitHubProxy/AdvancedUpdaterGitHubProxy.csproj"
+COPY ["src/AdvancedUpdaterGitHubProxy.csproj", "."]
+RUN dotnet restore "AdvancedUpdaterGitHubProxy.csproj"
 COPY . .
-WORKDIR "/src/src/AdvancedUpdaterGitHubProxy"
+WORKDIR "/src/src"
 RUN dotnet build "AdvancedUpdaterGitHubProxy.csproj" -c Release -o /app/build
 
 FROM build AS publish
