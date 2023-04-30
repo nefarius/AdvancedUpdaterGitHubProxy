@@ -30,11 +30,7 @@ builder.Services.AddFastEndpoints(options =>
     options.SourceGeneratorDiscoveredTypes = DiscoveredTypes.All;
 });
 
-builder.Services.AddSwaggerDoc(settings =>
-{
-    settings.Title = "Nefarius' Advanced Updater GitHub Proxy Service";
-    settings.Version = "v1";
-});
+builder.Services.SwaggerDocument();
 
 builder.Services.AddHttpClient("GitHub", client =>
     {
