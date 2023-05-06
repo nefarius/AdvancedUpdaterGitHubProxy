@@ -67,8 +67,9 @@ You can configure delivering pre-releases to selected test clients by doing two 
   {
     "UpdatesEndpoint": {
       "BetaClients": [
-        "127.0.0.1",
-        "::1"
+        "245.36.203.69",
+        "117.132.178.250",
+        "116.96.141.250"
       ]
     }
   }
