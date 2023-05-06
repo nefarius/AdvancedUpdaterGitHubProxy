@@ -64,7 +64,7 @@ You can configure delivering pre-releases to selected test clients by doing two 
 - Mark the release on GitHub as a pre-release and add the JSON snippet outlined above
 - Add one or more public IP addresses of your test clients' internet breakout to `appsettings.json` like so:  
   ```json
-  }
+  {
     "UpdatesEndpoint": {
       "BetaClients": [
         "127.0.0.1",
