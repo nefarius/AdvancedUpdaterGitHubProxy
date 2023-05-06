@@ -41,7 +41,8 @@ Put a comment block like below at the top of every GitHub release Markdown body,
 -->
 ```
 
-❗ The content of the comment block must be valid JSON in camelCase.
+❗ The content of the comment block must be valid JSON in camelCase.  
+❗ If you set `available` to `false` it will be skipped/excluded, even if it's the currently marked latest release.
 
 ## Get JSON response
 
