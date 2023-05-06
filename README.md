@@ -57,6 +57,25 @@ goaccess -c logs/access-20221017.0002.txt --date-format='%Y-%m-%d' --time-format
 
 For more options like HTML report generation [consult their FAQ](https://goaccess.io/faq).
 
+## Configure beta clients
+
+You can configure delivering pre-releases to selected test clients by doing two things:
+
+- Mark the release on GitHub as a pre-release and add the JSON snippet outlined above
+- Add one or more public IP addresses of your test clients' internet breakout to `appsettings.json` like so:  
+  ```json
+  }
+    "UpdatesEndpoint": {
+      "BetaClients": [
+        "127.0.0.1",
+        "::1"
+      ]
+    }
+  }
+  ```   
+
+If web requests come inf from these configured addresses, the cache is bypassed and the latest pre-release will be selected for delivery. You can now test your update with a small group of beta clients without influencing anything for the majority of your users!
+
 ## 3rd party credits
 
 - [FastEndpoints](https://github.com/FastEndpoints/Library)

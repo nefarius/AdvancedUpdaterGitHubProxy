@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
 
 using Microsoft.Extensions.Caching.Memory;
 
@@ -25,18 +26,18 @@ public class UpdatesRequest
 
 public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 {
+    private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
-
     private readonly ILogger<UpdatesEndpoint> _logger;
-
     private readonly IMemoryCache _memoryCache;
 
     public UpdatesEndpoint(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
-        ILogger<UpdatesEndpoint> logger)
+        ILogger<UpdatesEndpoint> logger, IConfiguration config)
     {
         _httpClientFactory = httpClientFactory;
         _memoryCache = memoryCache;
         _logger = logger;
+        _config = config;
     }
 
     public override void Configure()
@@ -57,7 +58,23 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
     {
         bool asJson = Query<bool>("asJson", false);
 
-        if (_memoryCache.TryGetValue(req.ToString(), out Release cached))
+        UpdatesEndpointConfig config = _config.GetSection("UpdatesEndpoint").Get<UpdatesEndpointConfig>();
+
+        IPAddress remoteIpAddress = HttpContext.Request.HttpContext.Connection.RemoteIpAddress;
+
+        // check for beta client
+        bool isBetaClient = config?.BetaClients is not null &&
+                            remoteIpAddress is not null &&
+                            config.BetaClients.Contains(remoteIpAddress.ToString());
+
+        if (isBetaClient)
+        {
+            _logger.LogWarning("Client {Remote} is beta client, bypassing cache and delivering pre-releases",
+                remoteIpAddress);
+        }
+        
+        // never deliver cached result to beta clients
+        if (!isBetaClient && _memoryCache.TryGetValue(req.ToString(), out Release cached))
         {
             _logger.LogDebug("Returning cached response for {Request}", req.ToString());
 
@@ -90,7 +107,9 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         IOrderedEnumerable<Release> releases = response.OrderByDescending(release => release.CreatedAt);
 
-        Release release = releases.FirstOrDefault(r => r.UpdaterInstructions is not null);
+        Release release = isBetaClient
+            ? releases.FirstOrDefault(r => r.UpdaterInstructions is not null)
+            : releases.FirstOrDefault(r => !r.Prerelease && r.UpdaterInstructions is not null);
 
         if (release is null)
         {
