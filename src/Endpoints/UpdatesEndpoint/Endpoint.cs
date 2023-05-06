@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Primitives;
 
 namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 
@@ -25,18 +26,18 @@ public class UpdatesRequest
 
 public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 {
+    private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
-
     private readonly ILogger<UpdatesEndpoint> _logger;
-
     private readonly IMemoryCache _memoryCache;
 
     public UpdatesEndpoint(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
-        ILogger<UpdatesEndpoint> logger)
+        ILogger<UpdatesEndpoint> logger, IConfiguration config)
     {
         _httpClientFactory = httpClientFactory;
         _memoryCache = memoryCache;
         _logger = logger;
+        _config = config;
     }
 
     public override void Configure()
@@ -56,6 +57,15 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
     public override async Task HandleAsync(UpdatesRequest req, CancellationToken ct)
     {
         bool asJson = Query<bool>("asJson", false);
+
+        UpdatesEndpointConfig config = _config.GetSection("UpdatesEndpoint").Get<UpdatesEndpointConfig>();
+
+        var remoteIpAddress = HttpContext.Request.HttpContext.Connection.RemoteIpAddress;
+
+        if (config?.BetaClients is not null && remoteIpAddress is not null && config.BetaClients.Contains(remoteIpAddress.ToString()))
+        {
+            int t = 0;
+        }
 
         if (_memoryCache.TryGetValue(req.ToString(), out Release cached))
         {
