@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
 
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Primitives;
 
 namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 
@@ -60,14 +60,21 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         UpdatesEndpointConfig config = _config.GetSection("UpdatesEndpoint").Get<UpdatesEndpointConfig>();
 
-        var remoteIpAddress = HttpContext.Request.HttpContext.Connection.RemoteIpAddress;
+        IPAddress remoteIpAddress = HttpContext.Request.HttpContext.Connection.RemoteIpAddress;
 
-        if (config?.BetaClients is not null && remoteIpAddress is not null && config.BetaClients.Contains(remoteIpAddress.ToString()))
+        // check for beta client
+        bool isBetaClient = config?.BetaClients is not null &&
+                            remoteIpAddress is not null &&
+                            config.BetaClients.Contains(remoteIpAddress.ToString());
+
+        if (isBetaClient)
         {
-            int t = 0;
+            _logger.LogWarning("Client {Remote} is beta client, bypassing cache and delivering pre-releases",
+                remoteIpAddress);
         }
-
-        if (_memoryCache.TryGetValue(req.ToString(), out Release cached))
+        
+        // never deliver cached result to beta clients
+        if (!isBetaClient && _memoryCache.TryGetValue(req.ToString(), out Release cached))
         {
             _logger.LogDebug("Returning cached response for {Request}", req.ToString());
 
@@ -100,7 +107,9 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         IOrderedEnumerable<Release> releases = response.OrderByDescending(release => release.CreatedAt);
 
-        Release release = releases.FirstOrDefault(r => r.UpdaterInstructions is not null);
+        Release release = isBetaClient
+            ? releases.FirstOrDefault(r => r.UpdaterInstructions is not null)
+            : releases.FirstOrDefault(r => !r.Prerelease && r.UpdaterInstructions is not null);
 
         if (release is null)
         {
