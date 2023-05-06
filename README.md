@@ -74,7 +74,7 @@ You can configure delivering pre-releases to selected test clients by doing two 
   }
   ```   
 
-If web requests come inf from these configured addresses, the cache is bypassed and the latest pre-release will be selected for delivery. You can now test your update with a small group of beta clients without influencing anything for the majority of your users!
+If web requests come in from these configured addresses, the cache is bypassed and the latest pre-release will be selected for delivery. You can now test your update with a small group of beta clients without influencing anything for the majority of your users!
 
 ## 3rd party credits
 
