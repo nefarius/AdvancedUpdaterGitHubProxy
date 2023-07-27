@@ -14,7 +14,7 @@ services:
       - TZ=Europe/Vienna
     labels:
       - traefik.enable=true
-      - traefik.http.routers.updates.rule=Host(`updates.vigem.org`)
+      - traefik.http.routers.updates.rule=Host(`updates.example.org`)
       - traefik.http.routers.updates.entrypoints=web-secure
       - traefik.http.routers.updates.tls=true
       - traefik.http.routers.updates.tls.certresolver=le
