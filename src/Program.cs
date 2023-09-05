@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 
+using AdvancedUpdaterGitHubProxy;
 using AdvancedUpdaterGitHubProxy.Extensions;
 
 using FastEndpoints.Swagger;
@@ -27,7 +28,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddFastEndpoints(options =>
 {
-    options.SourceGeneratorDiscoveredTypes = DiscoveredTypes.All;
+    options.SourceGeneratorDiscoveredTypes.AddRange(DiscoveredTypes.All);
 });
 
 builder.Services.SwaggerDocument();
