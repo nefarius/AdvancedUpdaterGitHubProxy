@@ -72,9 +72,9 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             _logger.LogWarning("Client {Remote} is beta client, bypassing cache and delivering pre-releases",
                 remoteIpAddress);
         }
-        
+
         // never deliver cached result to beta clients
-        if (!isBetaClient && _memoryCache.TryGetValue(req.ToString(), out Release cached))
+        if (!isBetaClient && _memoryCache.TryGetValue(req.ToString()!, out Release cached))
         {
             _logger.LogDebug("Returning cached response for {Request}", req.ToString());
 
@@ -84,7 +84,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             }
             else
             {
-                await SendStringAsync(cached.UpdaterInstructions.ToString(), cancellation: ct);
+                await SendStringAsync(cached.UpdaterInstructions.ToString()!, cancellation: ct);
             }
 
             return;
@@ -101,6 +101,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         if (response is null)
         {
+            _logger.LogInformation("No releases returned from GitHub API");
             await SendNotFoundAsync(ct);
             return;
         }
@@ -113,6 +114,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         if (release is null)
         {
+            _logger.LogInformation("No release with updater instructions found");
             await SendNotFoundAsync(ct);
             return;
         }
@@ -127,6 +129,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         if (instructions is null)
         {
+            _logger.LogInformation("Selected release has no updater instructions");
             await SendNotFoundAsync(ct);
             return;
         }
@@ -134,8 +137,8 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions()
             .SetAbsoluteExpiration(TimeSpan.FromHours(1));
 
-        _memoryCache.Set(req.ToString(), release, cacheEntryOptions);
+        _memoryCache.Set(req.ToString()!, release, cacheEntryOptions);
 
-        await SendStringAsync(instructions.ToString(), cancellation: ct);
+        await SendStringAsync(instructions.ToString()!, cancellation: ct);
     }
 }
