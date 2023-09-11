@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -12,6 +13,7 @@ using Nefarius.Utilities.AspNetCore;
 
 using Polly;
 using Polly.Contrib.WaitAndRetry;
+using Polly.Extensions.Http;
 
 using Prometheus;
 
@@ -38,8 +40,9 @@ builder.Services.AddHttpClient("GitHub", client =>
         client.BaseAddress = new Uri("https://api.github.com/");
         client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("AdvancedUpdaterGitHubProxy", "1"));
     })
-    .AddTransientHttpErrorPolicy(pb =>
-        pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
+    .AddTransientHttpErrorPolicy(pb => pb
+        //.OrResult(message => message.StatusCode == HttpStatusCode.Forbidden)
+        .WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(5), 5)));
 
 builder.Services.AddMemoryCache();
 

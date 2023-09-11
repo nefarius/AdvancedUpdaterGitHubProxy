@@ -102,7 +102,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         if (response is null)
         {
-            _logger.LogInformation("No releases returned from GitHub API");
+            _logger.LogDebug("No releases returned from GitHub API");
             await SendNotFoundAsync(ct);
             return;
         }
@@ -115,11 +115,11 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         if (release is null)
         {
-            _logger.LogInformation("No release with updater instructions found");
+            _logger.LogDebug("No release with updater instructions found");
             await SendNotFoundAsync(ct);
             return;
         }
-        
+
         MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions()
             .SetAbsoluteExpiration(TimeSpan.FromHours(1));
 
@@ -135,7 +135,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         if (instructions is null)
         {
-            _logger.LogInformation("Selected release has no updater instructions");
+            _logger.LogDebug("Selected release has no updater instructions");
             await SendNotFoundAsync(ct);
             return;
         }
