@@ -57,6 +57,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
     public override async Task HandleAsync(UpdatesRequest req, CancellationToken ct)
     {
         bool asJson = Query<bool>("asJson", false);
+        bool allowAny = Query<bool>("allowAny", false);
 
         UpdatesEndpointConfig config = _config.GetSection("UpdatesEndpoint").Get<UpdatesEndpointConfig>();
 
@@ -109,8 +110,8 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         IOrderedEnumerable<Release> releases = response.OrderByDescending(release => release.CreatedAt);
 
         Release release = isBetaClient
-            ? releases.FirstOrDefault(r => r.UpdaterInstructions is not null)
-            : releases.FirstOrDefault(r => !r.Prerelease && r.UpdaterInstructions is not null);
+            ? releases.FirstOrDefault(r => allowAny || r.UpdaterInstructions is not null)
+            : releases.FirstOrDefault(r => allowAny || (!r.Prerelease && r.UpdaterInstructions is not null));
 
         if (release is null)
         {
@@ -118,6 +119,11 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             await SendNotFoundAsync(ct);
             return;
         }
+        
+        MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions()
+            .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+
+        _memoryCache.Set(req.ToString()!, release, cacheEntryOptions);
 
         if (asJson)
         {
@@ -133,11 +139,6 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             await SendNotFoundAsync(ct);
             return;
         }
-
-        MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions()
-            .SetAbsoluteExpiration(TimeSpan.FromHours(1));
-
-        _memoryCache.Set(req.ToString()!, release, cacheEntryOptions);
 
         await SendStringAsync(instructions.ToString()!, cancellation: ct);
     }
