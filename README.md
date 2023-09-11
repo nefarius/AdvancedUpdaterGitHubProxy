@@ -48,6 +48,10 @@ Put a comment block like below at the top of every GitHub release Markdown body,
 
 If you'd like to get the latest cached release as original JSON (same schema as GitHub's API response) simply add the `?asJson=true` query parameter.
 
+### Get latest JSON whether it has an enriched body or not
+
+You can add the `?asJson=true&allowAny=true` query parameters to get the latest GitHub release, even if it doesn't contain the embedded updater meta-data in the body content. 
+
 ## W3C log analysis
 
 Two types of logs get produced in the `./logs` subdirectory during normal operation; a `server-*.log` which logs all normal application events and errors and gets cycled daily and `access-*.txt` access logs in W3C format. The latter can be visualized with [GoAccess](https://goaccess.io/) using the following custom log filter:
