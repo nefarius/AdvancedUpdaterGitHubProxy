@@ -5,6 +5,7 @@ using AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 namespace AdvancedUpdaterGitHubProxy.Endpoints.AssetsEndpoint;
 
 [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public class AssetsRequest
 {
     /// <summary>
