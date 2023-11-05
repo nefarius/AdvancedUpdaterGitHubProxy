@@ -7,4 +7,8 @@ namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 public sealed class UpdatesEndpointConfig
 {
     public List<string>? BetaClients { get; set; }
+
+    public List<string> BlacklistedUsernames { get; set; } = new();
+
+    public List<string> BlacklistedRepositories { get; set; } = new();
 }

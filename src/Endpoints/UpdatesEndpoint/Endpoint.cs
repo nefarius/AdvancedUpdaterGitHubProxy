@@ -61,6 +61,18 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         UpdatesEndpointConfig config = _config.GetSection("UpdatesEndpoint").Get<UpdatesEndpointConfig>();
 
+        if (config.BlacklistedUsernames.Contains(req.Username))
+        {
+            await SendErrorsAsync(500, ct);
+            return;
+        }
+        
+        if (config.BlacklistedRepositories.Contains(req.Repository))
+        {
+            await SendErrorsAsync(500, ct);
+            return;
+        }
+        
         IPAddress remoteIpAddress = HttpContext.Request.HttpContext.Connection.RemoteIpAddress;
 
         // check for beta client
