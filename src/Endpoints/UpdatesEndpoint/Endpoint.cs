@@ -63,13 +63,13 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         if (config.BlacklistedUsernames.Contains(req.Username))
         {
-            await SendErrorsAsync(500, ct);
+            await SendNotFoundAsync(ct);
             return;
         }
         
         if (config.BlacklistedRepositories.Contains(req.Repository))
         {
-            await SendErrorsAsync(500, ct);
+            await SendNotFoundAsync(ct);
             return;
         }
         
