@@ -27,6 +27,13 @@ Should the need arise to migrate releases away from GitHub you can do so without
 
 It's recommended to build a Docker Container with the provided Dockerfile and spin it up with the example compose file. Should run fine on any cloud provider (or VM, bare metal) offering Docker support.
 
+## How to build
+
+```bash
+docker build --platform linux/amd64 -t nefarius.azurecr.io/aughp:dev .
+docker push nefarius.azurecr.io/aughp:dev
+```
+
 ## Enriched release Markdown example
 
 Put a comment block like below at the top of every GitHub release Markdown body, those will get parsed and merged automatically into the API response when requested:
