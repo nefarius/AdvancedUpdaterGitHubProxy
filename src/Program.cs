@@ -68,7 +68,7 @@ app.UseFastEndpoints(options =>
     options.Serializer.Options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     options.Errors.StatusCode = StatusCodes.Status422UnprocessableEntity;
     options.Errors.ResponseBuilder = (list, context, arg3) => list.ToResponse();
-});
+}).UseSwaggerGen();
 
 app.MapMetrics();
 
@@ -79,8 +79,5 @@ if (app.Environment.IsProduction())
     app.UseDefaultFiles();
     app.UseStaticFiles(new StaticFileOptions { FileProvider = new PhysicalFileProvider(wwwroot) });
 }
-
-app.UseOpenApi();
-app.UseSwaggerUi3(x => x.ConfigureDefaults());
 
 await app.RunAsync();
