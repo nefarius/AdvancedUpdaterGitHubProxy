@@ -89,6 +89,26 @@ You can configure delivering pre-releases to selected test clients by doing two 
 
 If web requests come in from these configured addresses, the cache is bypassed and the latest pre-release will be selected for delivery. You can now test your update with a small group of beta clients without influencing anything for the majority of your users!
 
+## Blacklist usernames or repositories
+
+You can deny delivering updater configurations to entire user accounts or individual repositories like so:
+
+```json
+{
+    "UpdatesEndpoint": {
+        "BlacklistedUsernames": [
+            "CircumSpector"
+        ],
+        "BlacklistedRepositories": [
+            "ViGEmBus",
+            "HidHide"
+        ]
+    }
+}
+```
+
+This will deliver 404s for all requests targeting the matching routes. 
+
 ## 3rd party credits
 
 - [FastEndpoints](https://github.com/FastEndpoints/Library)
