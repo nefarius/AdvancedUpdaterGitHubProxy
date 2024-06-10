@@ -37,7 +37,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="System.Runtime.Caching" Version="8.0.0" />
 
-    <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="4.9.2">
+    <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="4.10.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
