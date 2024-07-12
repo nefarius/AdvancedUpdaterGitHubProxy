@@ -1,5 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿#nullable enable
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace AdvancedUpdaterGitHubProxy.Models;
 
@@ -61,11 +63,16 @@ internal sealed class UpdaterInstructionsFile
     /// </summary>
     public string Description { get; set; }
 
-    /// <summary>
-    ///     Creates the body of the updater INI file.
-    /// </summary>
-    public override string ToString()
+    [JsonIgnore]
+    public string? FileContent { get; private set; }
+
+    public void PopulateFileContent()
     {
+        if (!string.IsNullOrEmpty(FileContent))
+        {
+            throw new InvalidOperationException($"{nameof(FileContent)} is not supposed to be set at this state.");
+        }
+
         StringBuilder sb = new();
 
         sb.AppendLine(";aiu;");
@@ -116,6 +123,15 @@ internal sealed class UpdaterInstructionsFile
             sb.AppendLine($"NextDeprecated = {NextDeprecated}");
         }
 
-        return sb.ToString();
+        FileContent = sb.ToString();
+    }
+
+    /// <summary>
+    ///     Creates the body of the updater INI file.
+    /// </summary>
+    public override string ToString()
+    {
+        return FileContent ??
+               throw new InvalidOperationException($"{nameof(FileContent)} is not supposed to be empty at this state.");
     }
 }

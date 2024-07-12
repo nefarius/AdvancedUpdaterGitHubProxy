@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿#nullable enable
+
+using System.Net;
 
 using AdvancedUpdaterGitHubProxy.Models;
 
@@ -8,6 +10,9 @@ namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 
 public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 {
+    private static readonly MemoryCacheEntryOptions CacheEntryOptions = new MemoryCacheEntryOptions()
+        .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+
     private readonly IConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<UpdatesEndpoint> _logger;
@@ -41,55 +46,65 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         bool asJson = Query<bool>("asJson", false);
         bool allowAny = Query<bool>("allowAny", false);
 
-        UpdatesEndpointConfig config = _config.GetSection("UpdatesEndpoint").Get<UpdatesEndpointConfig>();
+        UpdatesEndpointConfig? config = _config.GetSection("UpdatesEndpoint").Get<UpdatesEndpointConfig>();
 
-        if (config.BlacklistedUsernames.Contains(req.Username))
+        if (config is not null && config.BlacklistedUsernames.Contains(req.Username))
         {
             await SendNotFoundAsync(ct);
             return;
         }
 
-        if (config.BlacklistedRepositories.Contains(req.Repository))
+        if (config is not null && config.BlacklistedRepositories.Contains(req.Repository))
         {
             await SendNotFoundAsync(ct);
             return;
         }
 
-        IPAddress remoteIpAddress = HttpContext.Request.HttpContext.Connection.RemoteIpAddress;
+        IPAddress? remoteIpAddress = HttpContext.Request.HttpContext.Connection.RemoteIpAddress;
 
         // check for beta client
         bool isBetaClient = config?.BetaClients is not null &&
                             remoteIpAddress is not null &&
                             config.BetaClients.Contains(remoteIpAddress.ToString());
 
-        if (isBetaClient)
+        switch (isBetaClient)
         {
-            _logger.LogWarning("Client {Remote} is beta client, bypassing cache and delivering pre-releases",
-                remoteIpAddress);
-        }
+            case true:
+                _logger.LogWarning("Client {Remote} is beta client, bypassing cache and delivering pre-releases",
+                    remoteIpAddress);
+                break;
+            // never deliver cached result to beta clients
+            case false when _memoryCache.TryGetValue(req.ToString(), out Release? cached):
+                {
+                    // a 404 from the GH API was cached
+                    if (cached is null)
+                    {
+                        await SendNotFoundAsync(ct);
+                        return;
+                    }
 
-        // never deliver cached result to beta clients
-        if (!isBetaClient && _memoryCache.TryGetValue(req.ToString()!, out Release cached))
-        {
-            _logger.LogDebug("Returning cached response for {Request}", req.ToString());
+                    _logger.LogDebug("Returning cached response for {Request}", req.ToString());
 
-            if (asJson)
-            {
-                await SendOkAsync(cached, ct);
-            }
-            else
-            {
-                await SendStringAsync(cached.UpdaterInstructions.ToString()!, cancellation: ct);
-            }
+                    if (asJson)
+                    {
+                        // original GH APi style payload has been requested
+                        await SendOkAsync(cached, ct);
+                    }
+                    else
+                    {
+                        // deliver cached populated INI file content
+                        await SendStringAsync(cached!.UpdaterInstructions!.ToString(), cancellation: ct);
+                    }
 
-            return;
+                    return;
+                }
         }
 
         _logger.LogInformation("Contacting GitHub API for {Request}", req.ToString());
 
         using HttpClient client = _httpClientFactory.CreateClient("GitHub");
 
-        List<Release> response = await client.GetFromJsonAsync<List<Release>>(
+        List<Release>? response = await client.GetFromJsonAsync<List<Release>>(
             $"repos/{req.Username}/{req.Repository}/releases",
             ct
         );
@@ -103,21 +118,21 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         IOrderedEnumerable<Release> releases = response.OrderByDescending(release => release.CreatedAt);
 
-        Release release = isBetaClient
-            ? releases.FirstOrDefault(r => allowAny || r.UpdaterInstructions is not null)
-            : releases.FirstOrDefault(r => allowAny || (!r.Prerelease && r.UpdaterInstructions is not null));
+        Release? release = isBetaClient
+            ? releases.FirstOrDefault(r => allowAny || r.BuildUpdaterInstructions())
+            : releases.FirstOrDefault(r => allowAny || (!r.Prerelease && r.BuildUpdaterInstructions()));
 
         if (release is null)
         {
             _logger.LogDebug("No release with updater instructions found");
+            _memoryCache.Set<Release?>(req.ToString(), null, CacheEntryOptions);
             await SendNotFoundAsync(ct);
             return;
         }
 
-        MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions()
-            .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+        release.UpdaterInstructions!.PopulateFileContent();
 
-        _memoryCache.Set(req.ToString()!, release, cacheEntryOptions);
+        _memoryCache.Set(req.ToString(), release, CacheEntryOptions);
 
         if (asJson)
         {
@@ -125,7 +140,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             return;
         }
 
-        UpdaterInstructionsFile instructions = release.UpdaterInstructions;
+        UpdaterInstructionsFile? instructions = release.UpdaterInstructions;
 
         if (instructions is null)
         {
@@ -134,6 +149,6 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             return;
         }
 
-        await SendStringAsync(instructions.ToString()!, cancellation: ct);
+        await SendStringAsync(instructions.ToString(), cancellation: ct);
     }
 }

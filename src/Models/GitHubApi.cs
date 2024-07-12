@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿#nullable enable
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -210,7 +211,7 @@ internal sealed partial class Release
     public string TargetCommitish { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("draft")]
     public bool Draft { get; set; }
@@ -234,54 +235,55 @@ internal sealed partial class Release
     public string ZipballUrl { get; set; }
 
     [JsonPropertyName("body")]
-    public string Body { get; set; }
+    public required string Body { get; set; }
 
     [JsonIgnore]
-    public UpdaterInstructionsFile UpdaterInstructions
+    public UpdaterInstructionsFile? UpdaterInstructions { get; private set; }
+
+    public bool BuildUpdaterInstructions()
     {
-        get
+        Asset? asset = Assets.FirstOrDefault();
+
+        if (asset is null)
         {
-            Asset asset = Assets.FirstOrDefault();
-
-            if (asset is null)
-            {
-                return null;
-            }
-
-            Match m = InstructionBlockRegex.Match(Body);
-
-            if (!m.Success)
-            {
-                return null;
-            }
-
-            // Get properties not available in GitHub API by parsing embedded JSON
-            UpdaterInstructionsFile block =
-                JsonSerializer.Deserialize<UpdaterInstructionsFile>(m.Groups[1].Value, SerializerOptions);
-
-            if (block is null)
-            {
-                return null;
-            }
-
-            // Merge in properties directly available from the release
-            block.Name = Name;
-            block.Url = asset.BrowserDownloadUrl;
-            block.Size = asset.Size;
-            block.ReleaseDate = PublishedAt;
-
-            Match vm = VersionRegex.Match(TagName);
-
-            if (!vm.Success)
-            {
-                return null;
-            }
-
-            block.Version = new Version(vm.Groups[1].Value);
-            block.Description = $"<a href=\"{HtmlUrl}\">Click to view the full changelog online.</a>";
-
-            return block;
+            return false;
         }
+
+        Match m = InstructionBlockRegex.Match(Body);
+
+        if (!m.Success)
+        {
+            return false;
+        }
+
+        // Get properties not available in GitHub API by parsing embedded JSON
+        UpdaterInstructionsFile? block =
+            JsonSerializer.Deserialize<UpdaterInstructionsFile>(m.Groups[1].Value, SerializerOptions);
+
+        if (block is null)
+        {
+            return false;
+        }
+
+        // Merge in properties directly available from the release
+        block.Name = Name;
+        block.Url = asset.BrowserDownloadUrl;
+        block.Size = asset.Size;
+        block.ReleaseDate = PublishedAt;
+
+        Match vm = VersionRegex.Match(TagName);
+
+        if (!vm.Success)
+        {
+            return false;
+        }
+
+        block.Version = new Version(vm.Groups[1].Value);
+        block.Description = $"<a href=\"{HtmlUrl}\">Click to view the full changelog online.</a>";
+
+        UpdaterInstructions = block;
+
+        return true;
     }
 
     [GeneratedRegex(@"((\d+\.)?(\d+\.)?(\*|\d+))")]
