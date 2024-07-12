@@ -25,3 +25,4 @@ LICENSE
 README.md
 /logs
 /assets
+**/*.gcdump

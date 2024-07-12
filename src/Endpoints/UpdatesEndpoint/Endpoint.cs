@@ -79,6 +79,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
                     // a 404 from the GH API was cached
                     if (cached is null)
                     {
+                        _logger.LogDebug("Returning cached response for {Request} as Not Found", req.ToString());
                         await SendNotFoundAsync(ct);
                         return;
                     }
