@@ -65,7 +65,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         // check for beta client
         bool isBetaClient = config?.BetaClients is not null &&
                             remoteIpAddress is not null &&
-                            config.BetaClients.Contains(remoteIpAddress.ToString());
+                            config.BetaClients.Contains(remoteIpAddress);
 
         switch (isBetaClient)
         {
@@ -117,31 +117,39 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             return;
         }
 
-        IOrderedEnumerable<Release> releases = response.OrderByDescending(release => release.CreatedAt);
+        List<Release> releases = response.OrderByDescending(release => release.CreatedAt).ToList();
 
-        Release? release = isBetaClient
+        Release? releaseWithInfo = isBetaClient
             ? releases.FirstOrDefault(r => allowAny || r.BuildUpdaterInstructions())
             : releases.FirstOrDefault(r => allowAny || (!r.Prerelease && r.BuildUpdaterInstructions()));
 
-        if (release is null)
+        if (releaseWithInfo is null)
         {
+            if (asJson || allowAny)
+            {
+                _memoryCache.Set(req.ToString(), releases.FirstOrDefault(), CacheEntryOptions);
+            }
+            else
+            {
+                _memoryCache.Set<Release?>(req.ToString(), null, CacheEntryOptions);
+            }
+
             _logger.LogDebug("No release with updater instructions found");
-            _memoryCache.Set<Release?>(req.ToString(), null, CacheEntryOptions);
             await SendNotFoundAsync(ct);
             return;
         }
 
-        release.UpdaterInstructions!.PopulateFileContent();
+        releaseWithInfo.UpdaterInstructions!.PopulateFileContent();
 
-        _memoryCache.Set(req.ToString(), release, CacheEntryOptions);
+        _memoryCache.Set(req.ToString(), releaseWithInfo, CacheEntryOptions);
 
         if (asJson)
         {
-            await SendOkAsync(release, ct);
+            await SendOkAsync(releaseWithInfo, ct);
             return;
         }
 
-        UpdaterInstructionsFile? instructions = release.UpdaterInstructions;
+        UpdaterInstructionsFile? instructions = releaseWithInfo.UpdaterInstructions;
 
         if (instructions is null)
         {

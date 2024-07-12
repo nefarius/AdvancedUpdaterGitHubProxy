@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 
 namespace AdvancedUpdaterGitHubProxy;
 
@@ -9,7 +10,7 @@ public sealed class UpdatesEndpointConfig
     /// <summary>
     ///     Optional collection of IP addresses that are allowed to bypass the cache to get an instant response.
     /// </summary>
-    public List<string>? BetaClients { get; set; }
+    public List<IPAddress>? BetaClients { get; set; }
 
     /// <summary>
     ///     Optional collection of usernames that should not be looked up in the GitHub API.
