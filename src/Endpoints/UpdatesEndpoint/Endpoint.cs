@@ -69,7 +69,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         }
 
         // never deliver cached result to beta clients
-        if (!isBetaClient && _memoryCache.TryGetValue(req.ToString()!, out Release cached))
+        if (!isBetaClient && _memoryCache.TryGetValue(req.ToString()!, out Models.Release cached))
         {
             _logger.LogDebug("Returning cached response for {Request}", req.ToString());
 
@@ -89,7 +89,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         using HttpClient client = _httpClientFactory.CreateClient("GitHub");
 
-        List<Release> response = await client.GetFromJsonAsync<List<Release>>(
+        List<Models.Release> response = await client.GetFromJsonAsync<List<Models.Release>>(
             $"repos/{req.Username}/{req.Repository}/releases",
             ct
         );
@@ -101,9 +101,9 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             return;
         }
 
-        IOrderedEnumerable<Release> releases = response.OrderByDescending(release => release.CreatedAt);
+        IOrderedEnumerable<Models.Release> releases = response.OrderByDescending(release => release.CreatedAt);
 
-        Release release = isBetaClient
+        Models.Release release = isBetaClient
             ? releases.FirstOrDefault(r => allowAny || r.UpdaterInstructions is not null)
             : releases.FirstOrDefault(r => allowAny || (!r.Prerelease && r.UpdaterInstructions is not null));
 

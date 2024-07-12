@@ -3,9 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
-using AdvancedUpdaterGitHubProxy.Models;
-
-namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
+namespace AdvancedUpdaterGitHubProxy.Models;
 
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]

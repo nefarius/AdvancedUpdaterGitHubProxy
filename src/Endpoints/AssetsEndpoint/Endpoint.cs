@@ -1,6 +1,8 @@
 ﻿using AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 using AdvancedUpdaterGitHubProxy.Models;
 
+using Release = AdvancedUpdaterGitHubProxy.Models.Release;
+
 namespace AdvancedUpdaterGitHubProxy.Endpoints.AssetsEndpoint;
 
 public class AssetsEndpoint : Endpoint<AssetsRequest>
