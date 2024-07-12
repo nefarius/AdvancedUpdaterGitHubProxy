@@ -1,10 +1,5 @@
 namespace AdvancedUpdaterGitHubProxy.Endpoints.IndexEndpoint;
 
-public class IndexResponse
-{
-    public string Message { get; init; } = default!;
-}
-
 public class IndexEndpoint : EndpointWithoutRequest<IndexResponse>
 {
     public override void Configure()

@@ -1,28 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Net;
+﻿using System.Net;
 
 using Microsoft.Extensions.Caching.Memory;
 
 namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
-
-[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
-public class UpdatesRequest
-{
-    /// <summary>
-    ///     The GitHub user or organization name.
-    /// </summary>
-    public string Username { get; set; } = default!;
-
-    /// <summary>
-    ///     The GitHub repository name.
-    /// </summary>
-    public string Repository { get; set; } = default!;
-
-    public override string ToString()
-    {
-        return $"{Username}/{Repository}";
-    }
-}
 
 public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 {

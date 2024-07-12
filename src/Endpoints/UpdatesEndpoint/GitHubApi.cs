@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 internal sealed class Author
 {
     [JsonPropertyName("login")]
@@ -64,6 +65,7 @@ internal sealed class Author
 }
 
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 internal sealed class Uploader
 {
     [JsonPropertyName("login")]
@@ -123,6 +125,7 @@ internal sealed class Uploader
 
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 internal sealed class Asset
 {
     [JsonPropertyName("url")]
@@ -170,11 +173,14 @@ internal sealed class Asset
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 [SuppressMessage("ReSharper", "CollectionNeverUpdated.Global")]
-internal sealed class Release
+internal sealed partial class Release
 {
-    private static readonly Regex InstructionBlockRegex = new(@"^<!--([\s\S]*?)-->", RegexOptions.Singleline);
+    private static readonly Regex InstructionBlockRegex = InstructionBlockXtractRegex();
 
-    private static readonly Regex VersionRegex = new(@"((\d+\.)?(\d+\.)?(\*|\d+))");
+    private static readonly Regex VersionRegex = SemVerRegex();
+
+    private static readonly JsonSerializerOptions SerializerOptions =
+        new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     [JsonPropertyName("url")]
     public string Url { get; set; }
@@ -250,8 +256,8 @@ internal sealed class Release
             }
 
             // Get properties not available in GitHub API by parsing embedded JSON
-            UpdaterInstructionsFile block = JsonSerializer.Deserialize<UpdaterInstructionsFile>(m.Groups[1].Value,
-                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            UpdaterInstructionsFile block =
+                JsonSerializer.Deserialize<UpdaterInstructionsFile>(m.Groups[1].Value, SerializerOptions);
 
             if (block is null)
             {
@@ -277,4 +283,10 @@ internal sealed class Release
             return block;
         }
     }
+
+    [GeneratedRegex(@"((\d+\.)?(\d+\.)?(\*|\d+))")]
+    private static partial Regex SemVerRegex();
+
+    [GeneratedRegex(@"^<!--([\s\S]*?)-->", RegexOptions.Singleline)]
+    private static partial Regex InstructionBlockXtractRegex();
 }
