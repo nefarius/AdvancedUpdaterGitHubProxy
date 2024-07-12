@@ -456,3 +456,4 @@ $RECYCLE.BIN/
 /appsettings.json
 /docker-compose.yml
 *.gcdump
+/dumps
