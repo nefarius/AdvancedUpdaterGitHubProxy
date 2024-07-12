@@ -15,8 +15,15 @@ RUN dotnet build "AdvancedUpdaterGitHubProxy.csproj" -c Release -o /app/build
 
 FROM build AS publish
 RUN dotnet publish "AdvancedUpdaterGitHubProxy.csproj" -c Release -o /app/publish
+# Install dotnet debug tools
+RUN dotnet tool install --tool-path /tools dotnet-trace \
+ && dotnet tool install --tool-path /tools dotnet-counters \
+ && dotnet tool install --tool-path /tools dotnet-dump \
+ && dotnet tool install --tool-path /tools dotnet-gcdump
 
 FROM base AS final
+WORKDIR /tools
+COPY --from=publish /tools .
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "AdvancedUpdaterGitHubProxy.dll"]
