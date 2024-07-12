@@ -66,11 +66,11 @@ internal sealed class UpdaterInstructionsFile
     [JsonIgnore]
     public string? FileContent { get; private set; }
 
-    public void PopulateFileContent()
+    public string? EnsureFileContent()
     {
         if (!string.IsNullOrEmpty(FileContent))
         {
-            throw new InvalidOperationException($"{nameof(FileContent)} is not supposed to be set at this state.");
+            return FileContent;
         }
 
         StringBuilder sb = new();
@@ -124,6 +124,8 @@ internal sealed class UpdaterInstructionsFile
         }
 
         FileContent = sb.ToString();
+
+        return FileContent;
     }
 
     /// <summary>

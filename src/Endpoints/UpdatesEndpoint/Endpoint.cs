@@ -120,8 +120,8 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         List<Release> releases = response.OrderByDescending(release => release.CreatedAt).ToList();
 
         Release? releaseWithInfo = isBetaClient
-            ? releases.FirstOrDefault(r => allowAny || r.BuildUpdaterInstructions())
-            : releases.FirstOrDefault(r => allowAny || (!r.Prerelease && r.BuildUpdaterInstructions()));
+            ? releases.FirstOrDefault(r => allowAny || r.EnsureUpdaterInstructions() is not null)
+            : releases.FirstOrDefault(r => allowAny || (!r.Prerelease && r.EnsureUpdaterInstructions() is not null));
 
         if (releaseWithInfo is null)
         {
@@ -139,7 +139,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             return;
         }
 
-        releaseWithInfo.UpdaterInstructions!.PopulateFileContent();
+        releaseWithInfo.EnsureUpdaterInstructions()?.EnsureFileContent();
 
         _memoryCache.Set(req.ToString(), releaseWithInfo, CacheEntryOptions);
 

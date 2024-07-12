@@ -240,20 +240,25 @@ internal sealed partial class Release
     [JsonIgnore]
     public UpdaterInstructionsFile? UpdaterInstructions { get; private set; }
 
-    public bool BuildUpdaterInstructions()
+    public UpdaterInstructionsFile? EnsureUpdaterInstructions()
     {
+        if (UpdaterInstructions is not null)
+        {
+            return UpdaterInstructions;
+        }
+
         Asset? asset = Assets.FirstOrDefault();
 
         if (asset is null)
         {
-            return false;
+            return null;
         }
 
         Match m = InstructionBlockRegex.Match(Body);
 
         if (!m.Success)
         {
-            return false;
+            return null;
         }
 
         // Get properties not available in GitHub API by parsing embedded JSON
@@ -262,7 +267,7 @@ internal sealed partial class Release
 
         if (block is null)
         {
-            return false;
+            return null;
         }
 
         // Merge in properties directly available from the release
@@ -275,7 +280,7 @@ internal sealed partial class Release
 
         if (!vm.Success)
         {
-            return false;
+            return null;
         }
 
         block.Version = new Version(vm.Groups[1].Value);
@@ -283,7 +288,7 @@ internal sealed partial class Release
 
         UpdaterInstructions = block;
 
-        return true;
+        return UpdaterInstructions;
     }
 
     [GeneratedRegex(@"((\d+\.)?(\d+\.)?(\*|\d+))")]
