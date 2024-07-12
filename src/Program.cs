@@ -18,7 +18,6 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args).Setup();
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.AddServerHeader = false;
-    options.AllowSynchronousIO = false;
 });
 
 builder.Services.AddAuthentication();
