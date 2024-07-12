@@ -48,13 +48,13 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             await SendNotFoundAsync(ct);
             return;
         }
-        
+
         if (config.BlacklistedRepositories.Contains(req.Repository))
         {
             await SendNotFoundAsync(ct);
             return;
         }
-        
+
         IPAddress remoteIpAddress = HttpContext.Request.HttpContext.Connection.RemoteIpAddress;
 
         // check for beta client
@@ -69,7 +69,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         }
 
         // never deliver cached result to beta clients
-        if (!isBetaClient && _memoryCache.TryGetValue(req.ToString()!, out Models.Release cached))
+        if (!isBetaClient && _memoryCache.TryGetValue(req.ToString()!, out Release cached))
         {
             _logger.LogDebug("Returning cached response for {Request}", req.ToString());
 
@@ -89,7 +89,7 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         using HttpClient client = _httpClientFactory.CreateClient("GitHub");
 
-        List<Models.Release> response = await client.GetFromJsonAsync<List<Models.Release>>(
+        List<Release> response = await client.GetFromJsonAsync<List<Release>>(
             $"repos/{req.Username}/{req.Repository}/releases",
             ct
         );
@@ -101,9 +101,9 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
             return;
         }
 
-        IOrderedEnumerable<Models.Release> releases = response.OrderByDescending(release => release.CreatedAt);
+        IOrderedEnumerable<Release> releases = response.OrderByDescending(release => release.CreatedAt);
 
-        Models.Release release = isBetaClient
+        Release release = isBetaClient
             ? releases.FirstOrDefault(r => allowAny || r.UpdaterInstructions is not null)
             : releases.FirstOrDefault(r => allowAny || (!r.Prerelease && r.UpdaterInstructions is not null));
 
