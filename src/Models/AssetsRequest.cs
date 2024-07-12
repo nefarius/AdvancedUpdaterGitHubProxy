@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace AdvancedUpdaterGitHubProxy.Endpoints.AssetsEndpoint;
+namespace AdvancedUpdaterGitHubProxy.Models;
 
 [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]

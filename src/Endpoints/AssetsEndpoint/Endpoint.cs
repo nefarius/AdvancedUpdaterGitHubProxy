@@ -1,4 +1,5 @@
 ﻿using AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
+using AdvancedUpdaterGitHubProxy.Models;
 
 namespace AdvancedUpdaterGitHubProxy.Endpoints.AssetsEndpoint;
 

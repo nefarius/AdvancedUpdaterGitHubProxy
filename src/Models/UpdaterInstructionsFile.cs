@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
+namespace AdvancedUpdaterGitHubProxy.Models;
 
 [SuppressMessage("ReSharper", "CollectionNeverUpdated.Global")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]

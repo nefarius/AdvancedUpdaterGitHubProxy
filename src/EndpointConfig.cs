@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Diagnostics.CodeAnalysis;
 
-namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
+namespace AdvancedUpdaterGitHubProxy;
 
 [SuppressMessage("ReSharper", "CollectionNeverUpdated.Global")]
 public sealed class UpdatesEndpointConfig

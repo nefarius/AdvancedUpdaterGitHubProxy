@@ -1,4 +1,4 @@
-﻿namespace AdvancedUpdaterGitHubProxy.Endpoints.IndexEndpoint;
+﻿namespace AdvancedUpdaterGitHubProxy.Models;
 
 public sealed class IndexResponse
 {

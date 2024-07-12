@@ -1,5 +1,7 @@
 ﻿using System.Net;
 
+using AdvancedUpdaterGitHubProxy.Models;
+
 using Microsoft.Extensions.Caching.Memory;
 
 namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;

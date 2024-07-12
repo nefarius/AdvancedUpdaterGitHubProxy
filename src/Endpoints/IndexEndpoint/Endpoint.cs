@@ -1,3 +1,5 @@
+using AdvancedUpdaterGitHubProxy.Models;
+
 namespace AdvancedUpdaterGitHubProxy.Endpoints.IndexEndpoint;
 
 public class IndexEndpoint : EndpointWithoutRequest<IndexResponse>
