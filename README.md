@@ -1,6 +1,4 @@
-<img src="assets/NSS-128x128.png" align="right" />
-
-# AdvancedUpdaterGitHubProxy
+# <img src="assets/NSS-128x128.png" align="left" />AdvancedUpdaterGitHubProxy
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nefarius/AdvancedUpdaterGitHubProxy/docker-image.yml)
 
