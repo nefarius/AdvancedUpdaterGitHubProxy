@@ -9,7 +9,6 @@ services:
     restart: unless-stopped
     networks:
       - web
-      - metrics
     environment:
       - TZ=Europe/Vienna
     labels:
@@ -24,43 +23,6 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  aughp-prometheus:
-    image: ubuntu/prometheus
-    container_name: aughp-prometheus
-    restart: unless-stopped
-    depends_on:
-      - aughp
-    networks:
-      - metrics
-    ports:
-      - "127.0.0.1:30092:9090"
-    environment:
-      - TZ=Europe/Vienna
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  aughp-grafana:
-    image: grafana/grafana-oss:latest
-    container_name: aughp-grafana
-    restart: unless-stopped
-    depends_on:
-      - aughp-prometheus
-    networks:
-      - metrics
-    ports:
-      - "127.0.0.1:30093:3000"
-    volumes:
-      - ./data/grafana:/var/lib/grafana
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "3"
-
 networks:
-  metrics:
   web:
     external: true
