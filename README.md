@@ -7,11 +7,11 @@ from GitHub Releases.
 
 ## Why? The Advanced Installer Updater already has [GitHub Integration](https://www.advancedinstaller.com/user-guide/qa-github-updater-integration.html#qa-github-updater-integration)?
 
-Although GitHub Integration now being a thing, I like the freedom of total customization with this proxy approach.
+Although GitHub Integration now is a thing, I like the freedom of total customization with this proxy approach.
 Reasons include:
 
 - **Custom domain and load-balancing**  
-  When hard-coding the GitHub releases URL you'll (obviously) depend on GitHubs availability and rate limits. With this
+  When hard-coding the GitHub releases URL you'll (obviously) depend on GitHub availability and rate limits. With this
   proxy you can completely customize the updater URL including the domain and using custom DNS load balancing and fault
   tolerance settings.
 - **Extra fields are read from Markdown body as HTML comments**  
@@ -28,7 +28,7 @@ Reasons include:
   When something goes wrong (bug in an update) you can simply pull the service without having to touch the release
   properties.
 - **Simplifies migration**  
-  Should the need arise to migrate releases away from GitHub you can do so without having to publish updates with a new
+  Should the need arise to migrate releases away from GitHub, you can do so without having to publish updates with a new
   URL, simply equip the proxy service with new backend logic and users won't notice a thing!
 
 ## How to use
