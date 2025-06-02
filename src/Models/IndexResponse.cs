@@ -2,5 +2,5 @@
 
 public sealed class IndexResponse
 {
-    public string Message { get; init; } = default!;
+    public required string Message { get; init; }
 }

@@ -13,12 +13,12 @@ internal sealed class UpdaterInstructionsFile
     /// <summary>
     ///     The name of the new release.
     /// </summary>
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     /// <summary>
     ///     The direct download URL to the new setup.
     /// </summary>
-    public string Url { get; set; }
+    public required string Url { get; set; }
 
     /// <summary>
     ///     The size - in bytes - of the setup on the server.
@@ -28,7 +28,7 @@ internal sealed class UpdaterInstructionsFile
     /// <summary>
     ///     The version that's available on the server.
     /// </summary>
-    public Version Version { get; set; } = null!;
+    public required Version Version { get; set; }
 
     /// <summary>
     ///     Gets whether this release should be made available as an update.
@@ -38,9 +38,9 @@ internal sealed class UpdaterInstructionsFile
     /// <summary>
     ///     If set the registry key where the installed application version information can be found.
     /// </summary>
-    public string RegistryKey { get; set; }
+    public string? RegistryKey { get; set; }
 
-    public string FilePath { get; set; }
+    public string? FilePath { get; set; }
 
     public List<string> Features { get; set; } = new();
 

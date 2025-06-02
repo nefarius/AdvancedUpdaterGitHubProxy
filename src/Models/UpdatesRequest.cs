@@ -9,12 +9,12 @@ public sealed class UpdatesRequest
     /// <summary>
     ///     The GitHub user or organization name.
     /// </summary>
-    public string Username { get; set; } = default!;
+    public required string Username { get; set; }
 
     /// <summary>
     ///     The GitHub repository name.
     /// </summary>
-    public string Repository { get; set; } = default!;
+    public required string Repository { get; set; }
 
     public override string ToString()
     {
