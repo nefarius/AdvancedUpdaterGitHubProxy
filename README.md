@@ -83,7 +83,7 @@ be visualized with [GoAccess](https://goaccess.io/) using the following custom l
 goaccess -c logs/access-20221017.0002.txt --date-format='%Y-%m-%d' --time-format='%H:%M:%S' --log-format='%d %t %h %^ %^ %^ %^ %m %U %^ %s %L %^ %v %u %^ %^'
 ```
 
-For more options like HTML report generation [consult their FAQ](https://goaccess.io/faq).
+For more options like HTML report generation, [consult their FAQ](https://goaccess.io/faq).
 
 ## Configure beta clients
 
