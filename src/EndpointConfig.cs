@@ -1,10 +1,8 @@
 ﻿#nullable enable
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace AdvancedUpdaterGitHubProxy;
 
-[SuppressMessage("ReSharper", "CollectionNeverUpdated.Global")]
 public sealed class UpdatesEndpointConfig
 {
     /// <summary>

@@ -12,7 +12,7 @@ public class IndexEndpoint : EndpointWithoutRequest<IndexResponse>
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        await SendOkAsync(new IndexResponse
+        await Send.OkAsync(new IndexResponse
         {
             Message = "Server up and running"
         }, ct);

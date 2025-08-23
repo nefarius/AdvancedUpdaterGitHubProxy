@@ -1,22 +1,12 @@
-﻿using AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
-using AdvancedUpdaterGitHubProxy.Models;
+﻿using AdvancedUpdaterGitHubProxy.Models;
 
 using Release = AdvancedUpdaterGitHubProxy.Models.Release;
 
 namespace AdvancedUpdaterGitHubProxy.Endpoints.AssetsEndpoint;
 
-public class AssetsEndpoint : Endpoint<AssetsRequest>
+public class AssetsEndpoint(IHttpClientFactory httpClientFactory, ILogger<AssetsEndpoint> logger)
+    : Endpoint<AssetsRequest>
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-
-    private readonly ILogger<AssetsEndpoint> _logger;
-
-    public AssetsEndpoint(IHttpClientFactory httpClientFactory, ILogger<AssetsEndpoint> logger)
-    {
-        _httpClientFactory = httpClientFactory;
-        _logger = logger;
-    }
-
     public override void Configure()
     {
         Verbs(Http.GET);
@@ -38,9 +28,9 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
 
     public override async Task HandleAsync(AssetsRequest req, CancellationToken ct)
     {
-        _logger.LogInformation("Contacting GitHub API for {Request}", req.ToString());
+        logger.LogInformation("Contacting GitHub API for {Request}", req.ToString());
 
-        using HttpClient client = _httpClientFactory.CreateClient("GitHub");
+        using HttpClient client = httpClientFactory.CreateClient("GitHub");
 
         List<Release> response = await client.GetFromJsonAsync<List<Release>>(
             $"https://api.github.com/repos/{req.Username}/{req.Repository}/releases",
@@ -49,7 +39,7 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
 
         if (response is null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
@@ -59,7 +49,7 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
 
         if (release is null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
@@ -69,7 +59,7 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
 
         if (asset is null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
@@ -79,7 +69,7 @@ public class AssetsEndpoint : Endpoint<AssetsRequest>
 
         Stream stream = await resp.Content.ReadAsStreamAsync(ct);
 
-        await SendStreamAsync(
+        await Send.StreamAsync(
             stream,
             string.IsNullOrEmpty(req.Filename)
                 ? asset.Name

@@ -1,9 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿namespace AdvancedUpdaterGitHubProxy.Models;
 
-namespace AdvancedUpdaterGitHubProxy.Models;
-
-[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
-[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public sealed class UpdatesRequest
 {
     /// <summary>

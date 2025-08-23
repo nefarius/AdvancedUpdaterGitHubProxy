@@ -8,24 +8,15 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 
-public class UpdatesEndpoint : Endpoint<UpdatesRequest>
+public class UpdatesEndpoint(
+    IHttpClientFactory httpClientFactory,
+    IMemoryCache memoryCache,
+    ILogger<UpdatesEndpoint> logger,
+    IConfiguration config)
+    : Endpoint<UpdatesRequest>
 {
     private static readonly MemoryCacheEntryOptions CacheEntryOptions = new MemoryCacheEntryOptions()
         .SetAbsoluteExpiration(TimeSpan.FromHours(1));
-
-    private readonly IConfiguration _config;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<UpdatesEndpoint> _logger;
-    private readonly IMemoryCache _memoryCache;
-
-    public UpdatesEndpoint(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
-        ILogger<UpdatesEndpoint> logger, IConfiguration config)
-    {
-        _httpClientFactory = httpClientFactory;
-        _memoryCache = memoryCache;
-        _logger = logger;
-        _config = config;
-    }
 
     public override void Configure()
     {
@@ -46,64 +37,64 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         bool asJson = Query<bool>("asJson", false);
         bool allowAny = Query<bool>("allowAny", false);
 
-        UpdatesEndpointConfig? config = _config.GetSection("UpdatesEndpoint").Get<UpdatesEndpointConfig>();
+        UpdatesEndpointConfig? config1 = config.GetSection("UpdatesEndpoint").Get<UpdatesEndpointConfig>();
 
-        if (config is not null && config.BlacklistedUsernames.Contains(req.Username))
+        if (config1 is not null && config1.BlacklistedUsernames.Contains(req.Username))
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
-        if (config is not null && config.BlacklistedRepositories.Contains(req.Repository))
+        if (config1 is not null && config1.BlacklistedRepositories.Contains(req.Repository))
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         IPAddress? remoteIpAddress = HttpContext.Request.HttpContext.Connection.RemoteIpAddress;
 
         // check for beta client
-        bool isBetaClient = config?.BetaClients is not null &&
+        bool isBetaClient = config1?.BetaClients is not null &&
                             remoteIpAddress is not null &&
-                            config.BetaClients.Contains(remoteIpAddress);
+                            config1.BetaClients.Contains(remoteIpAddress);
 
         switch (isBetaClient)
         {
             case true:
-                _logger.LogWarning("Client {Remote} is beta client, bypassing cache and delivering pre-releases",
+                logger.LogWarning("Client {Remote} is beta client, bypassing cache and delivering pre-releases",
                     remoteIpAddress);
                 break;
             // never deliver cached result to beta clients
-            case false when _memoryCache.TryGetValue(req.ToString(), out Release? cached):
+            case false when memoryCache.TryGetValue(req.ToString(), out Release? cached):
                 {
                     // a 404 from the GH API was cached
                     if (cached is null)
                     {
-                        _logger.LogDebug("Returning cached response for {Request} as Not Found", req.ToString());
-                        await SendNotFoundAsync(ct);
+                        logger.LogDebug("Returning cached response for {Request} as Not Found", req.ToString());
+                        await Send.NotFoundAsync(ct);
                         return;
                     }
 
-                    _logger.LogDebug("Returning cached response for {Request}", req.ToString());
+                    logger.LogDebug("Returning cached response for {Request}", req.ToString());
 
                     if (asJson)
                     {
                         // original GH APi style payload has been requested
-                        await SendOkAsync(cached, ct);
+                        await Send.OkAsync(cached, ct);
                     }
                     else
                     {
                         // deliver cached populated INI file content
-                        await SendStringAsync(cached!.UpdaterInstructions!.ToString(), cancellation: ct);
+                        await Send.StringAsync(cached!.UpdaterInstructions!.ToString(), cancellation: ct);
                     }
 
                     return;
                 }
         }
 
-        _logger.LogInformation("Contacting GitHub API for {Request}", req.ToString());
+        logger.LogInformation("Contacting GitHub API for {Request}", req.ToString());
 
-        using HttpClient client = _httpClientFactory.CreateClient("GitHub");
+        using HttpClient client = httpClientFactory.CreateClient("GitHub");
 
         List<Release>? response = await client.GetFromJsonAsync<List<Release>>(
             $"repos/{req.Username}/{req.Repository}/releases",
@@ -112,8 +103,8 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         if (response is null)
         {
-            _logger.LogDebug("No releases returned from GitHub API");
-            await SendNotFoundAsync(ct);
+            logger.LogDebug("No releases returned from GitHub API");
+            await Send.NotFoundAsync(ct);
             return;
         }
 
@@ -127,25 +118,25 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
         {
             if (asJson || allowAny)
             {
-                _memoryCache.Set(req.ToString(), releases.FirstOrDefault(), CacheEntryOptions);
+                memoryCache.Set(req.ToString(), releases.FirstOrDefault(), CacheEntryOptions);
             }
             else
             {
-                _memoryCache.Set<Release?>(req.ToString(), null, CacheEntryOptions);
+                memoryCache.Set<Release?>(req.ToString(), null, CacheEntryOptions);
             }
 
-            _logger.LogDebug("No release with updater instructions found");
-            await SendNotFoundAsync(ct);
+            logger.LogDebug("No release with updater instructions found");
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         releaseWithInfo.EnsureUpdaterInstructions()?.EnsureFileContent();
 
-        _memoryCache.Set(req.ToString(), releaseWithInfo, CacheEntryOptions);
+        memoryCache.Set(req.ToString(), releaseWithInfo, CacheEntryOptions);
 
         if (asJson)
         {
-            await SendOkAsync(releaseWithInfo, ct);
+            await Send.OkAsync(releaseWithInfo, ct);
             return;
         }
 
@@ -153,11 +144,11 @@ public class UpdatesEndpoint : Endpoint<UpdatesRequest>
 
         if (instructions is null)
         {
-            _logger.LogDebug("Selected release has no updater instructions");
-            await SendNotFoundAsync(ct);
+            logger.LogDebug("Selected release has no updater instructions");
+            await Send.NotFoundAsync(ct);
             return;
         }
 
-        await SendStringAsync(instructions.ToString(), cancellation: ct);
+        await Send.StringAsync(instructions.ToString(), cancellation: ct);
     }
 }
