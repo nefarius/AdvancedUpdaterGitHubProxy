@@ -22,10 +22,10 @@ Reasons include:
   Request responses to the update configuration file URL get cached in memory for an hour. This reduces the load on the
   GitHub API and eliminates the risk of getting block temporarily for exceeding the public API rate limits.
 - **Logging and statistics**  
-  Why should only Big Tech have all your data? 🤣 In all seriousness though, being able to generate statistics from
+  Why should only Big Tech have all your data? 🤣 In all seriousness, though, being able to generate statistics from
   access data while not being completely dependent on GitHub sure feels nice.
 - **Easy to disable updates if something goes wrong**  
-  When something goes wrong (bug in an update) you can simply pull the service without having to touch the release
+  When something goes wrong (bug in an update), you can simply pull the service without having to touch the release
   properties.
 - **Simplifies migration**  
   Should the need arise to migrate releases away from GitHub, you can do so without having to publish updates with a new
