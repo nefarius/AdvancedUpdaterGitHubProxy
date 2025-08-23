@@ -34,6 +34,7 @@ builder.Services.AddHttpClient("GitHub", client =>
     {
         client.BaseAddress = new Uri("https://api.github.com/");
         client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("AdvancedUpdaterGitHubProxy", "1"));
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", builder.Configuration["GitHub:Token"]);
     })
     .AddTransientHttpErrorPolicy(pb => pb
         //.OrResult(message => message.StatusCode == HttpStatusCode.Forbidden)
