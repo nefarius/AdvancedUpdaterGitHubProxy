@@ -3,6 +3,7 @@ using System.Text.Json;
 
 using AdvancedUpdaterGitHubProxy;
 using AdvancedUpdaterGitHubProxy.Extensions;
+using AdvancedUpdaterGitHubProxy.Services;
 
 using Microsoft.Extensions.FileProviders;
 
@@ -37,6 +38,7 @@ builder.Services.AddHttpClient("GitHub", client =>
         //.OrResult(message => message.StatusCode == HttpStatusCode.Forbidden)
         .WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(5), 5)));
 
+builder.Services.AddSingleton<GitHubApiService>();
 builder.Services.AddMemoryCache();
 
 

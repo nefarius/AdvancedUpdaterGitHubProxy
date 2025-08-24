@@ -13,12 +13,12 @@ internal sealed class UpdaterInstructionsFile
     /// <summary>
     ///     The name of the new release.
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; }
 
     /// <summary>
     ///     The direct download URL to the new setup.
     /// </summary>
-    public required string Url { get; set; }
+    public string Url { get; set; }
 
     /// <summary>
     ///     The size - in bytes - of the setup on the server.
@@ -28,7 +28,7 @@ internal sealed class UpdaterInstructionsFile
     /// <summary>
     ///     The version that's available on the server.
     /// </summary>
-    public required Version Version { get; set; }
+    public Version Version { get; set; }
 
     /// <summary>
     ///     Gets whether this release should be made available as an update.

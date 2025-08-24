@@ -1,18 +1,17 @@
-﻿#nullable enable
-
-using System.Net;
+﻿using System.Net;
 
 using AdvancedUpdaterGitHubProxy.Models;
+using AdvancedUpdaterGitHubProxy.Services;
 
 using Microsoft.Extensions.Caching.Memory;
 
 namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 
-public class UpdatesEndpoint(
-    IHttpClientFactory httpClientFactory,
+internal class UpdatesEndpoint(
     IMemoryCache memoryCache,
     ILogger<UpdatesEndpoint> logger,
-    IConfiguration config)
+    IConfiguration config,
+    GitHubApiService github)
     : Endpoint<UpdatesRequest>
 {
     private static readonly MemoryCacheEntryOptions CacheEntryOptions = new MemoryCacheEntryOptions()
@@ -37,15 +36,10 @@ public class UpdatesEndpoint(
         bool asJson = Query<bool>("asJson", false);
         bool allowAny = Query<bool>("allowAny", false);
 
-        UpdatesEndpointConfig? config1 = config.GetSection("UpdatesEndpoint").Get<UpdatesEndpointConfig>();
+        UpdatesEndpointConfig? epConfig = config.GetSection("UpdatesEndpoint").Get<UpdatesEndpointConfig>();
 
-        if (config1 is not null && config1.BlacklistedUsernames.Contains(req.Username))
-        {
-            await Send.NotFoundAsync(ct);
-            return;
-        }
-
-        if (config1 is not null && config1.BlacklistedRepositories.Contains(req.Repository))
+        if ((epConfig is not null && epConfig.BlacklistedUsernames.Contains(req.Username)) ||
+            (epConfig is not null && epConfig.BlacklistedRepositories.Contains(req.Repository)))
         {
             await Send.NotFoundAsync(ct);
             return;
@@ -54,9 +48,9 @@ public class UpdatesEndpoint(
         IPAddress? remoteIpAddress = HttpContext.Request.HttpContext.Connection.RemoteIpAddress;
 
         // check for beta client
-        bool isBetaClient = config1?.BetaClients is not null &&
+        bool isBetaClient = epConfig?.BetaClients is not null &&
                             remoteIpAddress is not null &&
-                            config1.BetaClients.Contains(remoteIpAddress);
+                            epConfig.BetaClients.Contains(remoteIpAddress);
 
         switch (isBetaClient)
         {
@@ -92,33 +86,30 @@ public class UpdatesEndpoint(
                 }
         }
 
-        logger.LogInformation("Contacting GitHub API for {Request}", req.ToString());
+        IReadOnlyList<Octokit.Release>? releases = await github.GetReleases(req.Username, req.Repository);
 
-        using HttpClient client = httpClientFactory.CreateClient("GitHub");
-
-        List<Release>? response = await client.GetFromJsonAsync<List<Release>>(
-            $"repos/{req.Username}/{req.Repository}/releases",
-            ct
-        );
-
-        if (response is null)
+        if (releases is null)
         {
             logger.LogDebug("No releases returned from GitHub API");
             await Send.NotFoundAsync(ct);
             return;
         }
 
-        List<Release> releases = response.OrderByDescending(release => release.CreatedAt).ToList();
+        List<UpdateRelease> releasesSorted = releases
+            .OrderByDescending(release => release.CreatedAt)
+            .Select(r => new UpdateRelease(r))
+            .ToList();
 
-        Release? releaseWithInfo = isBetaClient
-            ? releases.FirstOrDefault(r => allowAny || r.EnsureUpdaterInstructions() is not null)
-            : releases.FirstOrDefault(r => allowAny || (!r.Prerelease && r.EnsureUpdaterInstructions() is not null));
+        UpdateRelease? releaseWithInfo = isBetaClient
+            ? releasesSorted.FirstOrDefault(r => allowAny || r.EnsureUpdaterInstructions() is not null)
+            : releasesSorted.FirstOrDefault(r =>
+                allowAny || (!r.Prerelease && r.EnsureUpdaterInstructions() is not null));
 
         if (releaseWithInfo is null)
         {
             if (asJson || allowAny)
             {
-                memoryCache.Set(req.ToString(), releases.FirstOrDefault(), CacheEntryOptions);
+                memoryCache.Set(req.ToString(), releasesSorted.FirstOrDefault(), CacheEntryOptions);
             }
             else
             {

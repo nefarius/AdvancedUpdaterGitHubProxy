@@ -6,8 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace AdvancedUpdaterGitHubProxy.Models;
 
-[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
+
 internal sealed class Author
 {
     [JsonPropertyName("login")]
@@ -65,8 +64,6 @@ internal sealed class Author
     public bool SiteAdmin { get; set; }
 }
 
-[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
 internal sealed class Uploader
 {
     [JsonPropertyName("login")]
@@ -124,9 +121,6 @@ internal sealed class Uploader
     public bool SiteAdmin { get; set; }
 }
 
-[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
 internal sealed class Asset
 {
     [JsonPropertyName("url")]
@@ -169,11 +163,6 @@ internal sealed class Asset
     public string BrowserDownloadUrl { get; set; }
 }
 
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
-[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-[SuppressMessage("ReSharper", "CollectionNeverUpdated.Global")]
 internal sealed partial class Release
 {
     private static readonly Regex InstructionBlockRegex = InstructionBlockXtractRegex();
