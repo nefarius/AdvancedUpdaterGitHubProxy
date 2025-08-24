@@ -5,6 +5,8 @@ using AdvancedUpdaterGitHubProxy.Services;
 
 using Microsoft.Extensions.Caching.Memory;
 
+using Octokit;
+
 namespace AdvancedUpdaterGitHubProxy.Endpoints.UpdatesEndpoint;
 
 internal class UpdatesEndpoint(
@@ -59,7 +61,7 @@ internal class UpdatesEndpoint(
                     remoteIpAddress);
                 break;
             // never deliver cached result to beta clients
-            case false when memoryCache.TryGetValue(req.ToString(), out Release? cached):
+            case false when memoryCache.TryGetValue(req.ToString(), out UpdateRelease? cached):
                 {
                     // a 404 from the GH API was cached
                     if (cached is null)
@@ -86,7 +88,7 @@ internal class UpdatesEndpoint(
                 }
         }
 
-        IReadOnlyList<Octokit.Release>? releases = await github.GetReleases(req.Username, req.Repository);
+        IReadOnlyList<Release>? releases = await github.GetReleases(req.Username, req.Repository);
 
         if (releases is null)
         {
@@ -113,7 +115,7 @@ internal class UpdatesEndpoint(
             }
             else
             {
-                memoryCache.Set<Release?>(req.ToString(), null, CacheEntryOptions);
+                memoryCache.Set<UpdateRelease?>(req.ToString(), null, CacheEntryOptions);
             }
 
             logger.LogDebug("No release with updater instructions found");
