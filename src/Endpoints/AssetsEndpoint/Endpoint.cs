@@ -1,10 +1,16 @@
 ﻿using AdvancedUpdaterGitHubProxy.Models;
+using AdvancedUpdaterGitHubProxy.Services;
 
-using Release = AdvancedUpdaterGitHubProxy.Models.Release;
+using Octokit;
+
+using Release = Octokit.Release;
 
 namespace AdvancedUpdaterGitHubProxy.Endpoints.AssetsEndpoint;
 
-public class AssetsEndpoint(IHttpClientFactory httpClientFactory, ILogger<AssetsEndpoint> logger)
+internal class AssetsEndpoint(
+    IHttpClientFactory httpClientFactory,
+    ILogger<AssetsEndpoint> logger,
+    GitHubApiService github)
     : Endpoint<AssetsRequest>
 {
     public override void Configure()
@@ -32,10 +38,7 @@ public class AssetsEndpoint(IHttpClientFactory httpClientFactory, ILogger<Assets
 
         using HttpClient client = httpClientFactory.CreateClient("GitHub");
 
-        List<Release> response = await client.GetFromJsonAsync<List<Release>>(
-            $"https://api.github.com/repos/{req.Username}/{req.Repository}/releases",
-            ct
-        );
+        IReadOnlyList<Release>? response = await github.GetReleases(req.Username, req.Repository);
 
         if (response is null)
         {
@@ -45,7 +48,7 @@ public class AssetsEndpoint(IHttpClientFactory httpClientFactory, ILogger<Assets
 
         IOrderedEnumerable<Release> releases = response.OrderByDescending(release => release.CreatedAt);
 
-        Release release = releases.FirstOrDefault();
+        Release? release = releases.FirstOrDefault();
 
         if (release is null)
         {
@@ -53,7 +56,7 @@ public class AssetsEndpoint(IHttpClientFactory httpClientFactory, ILogger<Assets
             return;
         }
 
-        Asset asset = string.IsNullOrEmpty(req.Architecture)
+        ReleaseAsset? asset = string.IsNullOrEmpty(req.Architecture)
             ? release.Assets.FirstOrDefault()
             : release.Assets.FirstOrDefault(a => a.Name.Contains(req.Architecture, StringComparison.OrdinalIgnoreCase));
 
