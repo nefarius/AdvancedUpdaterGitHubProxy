@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
@@ -9,7 +10,8 @@ using Octokit;
 namespace AdvancedUpdaterGitHubProxy.Models;
 
 [UsedImplicitly]
-internal partial class UpdateRelease
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+internal partial class UpdateRelease(Release release)
 {
     private static readonly Regex InstructionBlockRegex = InstructionBlockXtractRegex();
     private static readonly Regex VersionRegex = SemVerRegex();
@@ -17,22 +19,15 @@ internal partial class UpdateRelease
     private static readonly JsonSerializerOptions SerializerOptions =
         new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
-    private readonly Octokit.Release _release;
-
-    public UpdateRelease(Octokit.Release release)
-    {
-        _release = release;
-    }
-
     // Expose release data you actually need
-    public string Name => _release.Name;
-    public string TagName => _release.TagName;
-    public string Body => _release.Body;
-    public IReadOnlyList<ReleaseAsset> Assets => _release.Assets;
-    public DateTimeOffset CreatedAt => _release.CreatedAt;
-    public DateTimeOffset? PublishedAt => _release.PublishedAt;
-    public bool Prerelease => _release.Prerelease;
-    public Uri HtmlUrl => new(_release.HtmlUrl);
+    public string Name => release.Name;
+    public string TagName => release.TagName;
+    public string Body => release.Body;
+    public IReadOnlyList<ReleaseAsset> Assets => release.Assets;
+    public DateTimeOffset CreatedAt => release.CreatedAt;
+    public DateTimeOffset? PublishedAt => release.PublishedAt;
+    public bool Prerelease => release.Prerelease;
+    public Uri HtmlUrl => new(release.HtmlUrl);
 
     [JsonIgnore] public UpdaterInstructionsFile? UpdaterInstructions { get; private set; }
 
