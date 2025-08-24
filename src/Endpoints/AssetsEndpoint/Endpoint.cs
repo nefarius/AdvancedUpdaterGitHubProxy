@@ -34,7 +34,7 @@ internal class AssetsEndpoint(
 
     public override async Task HandleAsync(AssetsRequest req, CancellationToken ct)
     {
-        logger.LogInformation("Contacting GitHub API for {Request}", req.ToString());
+        logger.LogDebug("Contacting GitHub API for {Request}", req.ToString());
 
         using HttpClient client = httpClientFactory.CreateClient("GitHub");
 
