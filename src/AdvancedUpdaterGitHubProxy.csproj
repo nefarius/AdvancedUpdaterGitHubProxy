@@ -35,7 +35,7 @@
     <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageReference Include="System.Runtime.Caching" Version="9.0.8" />
+    <PackageReference Include="System.Runtime.Caching" Version="10.0.3" />
 
     <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="5.0.0">
       <PrivateAssets>all</PrivateAssets>
