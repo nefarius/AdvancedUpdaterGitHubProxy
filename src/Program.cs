@@ -22,10 +22,7 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
-builder.Services.AddFastEndpoints(options =>
-{
-    options.SourceGeneratorDiscoveredTypes.AddRange(DiscoveredTypes.All);
-});
+builder.Services.AddFastEndpoints(DiscoveredTypes.All);
 
 builder.Services.AddHttpClient("GitHub", client =>
     {
